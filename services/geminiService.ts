@@ -446,16 +446,40 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
 // Helper function to map tickers to sectors
 function getSectorForTicker(ticker: string): string {
     const sectorMap: { [key: string]: string } = {
+        // Technology
         'AAPL': 'Technology', 'MSFT': 'Technology', 'GOOGL': 'Technology', 'NVDA': 'Technology',
-        'META': 'Technology', 'TSLA': 'Automotive', 'AMZN': 'Consumer Discretionary',
+        'META': 'Technology', 'AVGO': 'Technology', 'CSCO': 'Technology', 'ADBE': 'Technology',
+        'CRM': 'Technology', 'ORCL': 'Technology', 'INTC': 'Technology', 'AMD': 'Technology',
+        'TXN': 'Technology', 'ACN': 'Technology',
+        
+        // Consumer Discretionary
+        'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary',
+        'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary',
+        
+        // Healthcare
         'JNJ': 'Healthcare', 'UNH': 'Healthcare', 'MRK': 'Healthcare', 'ABBV': 'Healthcare',
-        'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BAC': 'Financials',
-        'XOM': 'Energy', 'CVX': 'Energy', 'WMT': 'Consumer Staples', 'PG': 'Consumer Staples',
-        'KO': 'Consumer Staples', 'PEP': 'Consumer Staples', 'COST': 'Consumer Staples',
-        'DIS': 'Communication Services', 'NFLX': 'Communication Services', 'CMCSA': 'Communication Services',
-        'BA': 'Industrials', 'CAT': 'Industrials', 'UPS': 'Industrials', 'HON': 'Industrials'
+        'LLY': 'Healthcare', 'TMO': 'Healthcare', 'ABT': 'Healthcare', 'DHR': 'Healthcare',
+        'BMY': 'Healthcare',
+        
+        // Financials
+        'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BRK.B': 'Financials',
+        
+        // Energy
+        'XOM': 'Energy', 'CVX': 'Energy',
+        
+        // Consumer Staples
+        'WMT': 'Consumer Staples', 'PG': 'Consumer Staples', 'KO': 'Consumer Staples',
+        'PEP': 'Consumer Staples', 'COST': 'Consumer Staples', 'PM': 'Consumer Staples',
+        
+        // Communication Services
+        'DIS': 'Communication', 'NFLX': 'Communication', 'CMCSA': 'Communication',
+        'VZ': 'Communication',
+        
+        // Industrials
+        'BA': 'Industrials', 'CAT': 'Industrials', 'UPS': 'Industrials', 'HON': 'Industrials',
+        'NEE': 'Industrials', 'LIN': 'Industrials'
     };
-    return sectorMap[ticker] || 'Technology';
+    return sectorMap[ticker] || 'Other';
 }
 
 export const fetchMarketData = async (tickers: string[]): Promise<{ [key: string]: number }> => {
