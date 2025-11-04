@@ -15,6 +15,7 @@ export const usePortfolio = (transactions: Transaction[]) => {
   const { portfolioPrices, isLoading: isMarketDataLoading } = useMarketData();
 
   const baseHoldings = useMemo(() => {
+    console.log('🔄 usePortfolio: Calculating base holdings from transactions:', transactions.length);
     const calculatedHoldings: { [key: string]: Holding } = {};
     transactions
       .slice()
@@ -52,12 +53,21 @@ export const usePortfolio = (transactions: Transaction[]) => {
 
 
   useEffect(() => {
+    console.log('💼 usePortfolio: Calculating portfolio', {
+      isMarketDataLoading,
+      baseHoldingsCount: baseHoldings.length,
+      portfolioPricesCount: Object.keys(portfolioPrices).length,
+      portfolioPrices
+    });
+
     if (isMarketDataLoading && baseHoldings.length > 0) {
       // The provider is loading for the first time, don't compute until it's done.
+      console.log('⏳ usePortfolio: Waiting for market data to load');
       return;
     }
 
     if (baseHoldings.length === 0) {
+      console.log('📭 usePortfolio: No holdings, setting empty state');
       setHoldings([]);
       setSummary({ totalValue: 0, totalCost: 0, totalPL: 0, totalPLPercent: 0 });
       setAllocationData([]);
@@ -71,11 +81,20 @@ export const usePortfolio = (transactions: Transaction[]) => {
       const currentPrice = portfolioPrices[h.ticker] ?? null;
       const newHolding = {...h, currentPrice };
 
+      console.log(`💰 Processing ${h.ticker}:`, {
+        quantity: h.quantity,
+        totalCost: h.totalCost,
+        currentPrice,
+        marketValue: currentPrice ? h.quantity * currentPrice : null
+      });
+
       if (currentPrice !== null) {
         newHolding.marketValue = newHolding.quantity * currentPrice;
         newHolding.unrealizedPL = newHolding.marketValue - newHolding.totalCost;
         newHolding.unrealizedPLPercent = newHolding.totalCost > 0 ? newHolding.unrealizedPL / newHolding.totalCost : 0;
         totalValue += newHolding.marketValue;
+      } else {
+        console.warn(`⚠️ No price found for ${h.ticker}`);
       }
       totalCost += newHolding.totalCost;
       return newHolding;
@@ -83,6 +102,13 @@ export const usePortfolio = (transactions: Transaction[]) => {
 
     const totalPL = totalValue - totalCost;
     const totalPLPercent = totalCost > 0 ? totalPL / totalCost : 0;
+    
+    console.log('📊 Portfolio Summary:', {
+      totalValue,
+      totalCost,
+      totalPL,
+      totalPLPercent
+    });
     
     setHoldings(finalHoldings);
     setSummary({ totalValue, totalCost, totalPL, totalPLPercent });
