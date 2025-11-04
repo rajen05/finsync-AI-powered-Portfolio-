@@ -94,7 +94,7 @@ const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => 
         </div>
 
         <div className="mt-4">
-            <StockChart data={details.historicalData} changePercent={details.changePercent} />
+            <StockChart data={details.historicalData} changePercent={details.changePercent} symbol={details.ticker} />
         </div>
       </div>
       
