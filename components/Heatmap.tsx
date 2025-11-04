@@ -196,35 +196,25 @@ const Heatmap: React.FC = () => {
                             </div>
                             
                             {/* Stock Logo */}
-                            <div className="w-7 h-7 bg-white/95 rounded flex items-center justify-center shadow-sm flex-shrink-0 relative overflow-hidden">
-                              {stock.logoUrl && (
+                            <div className="w-7 h-7 bg-white/95 rounded flex items-center justify-center shadow-sm flex-shrink-0 overflow-hidden">
+                              {stock.logoUrl ? (
                                 <img 
                                   src={stock.logoUrl} 
                                   alt={stock.ticker}
                                   className="w-full h-full object-contain p-0.5"
                                   onError={(e) => { 
-                                    // Hide image and show letter fallback
-                                    const parent = e.currentTarget.parentElement;
-                                    e.currentTarget.style.display = 'none';
-                                    if (parent) {
-                                      const fallback = parent.querySelector('.logo-fallback');
-                                      if (fallback) (fallback as HTMLElement).style.display = 'flex';
-                                    }
-                                  }}
-                                  onLoad={(e) => {
-                                    // Hide letter if logo loads successfully
+                                    // Replace with letter on error
                                     const parent = e.currentTarget.parentElement;
                                     if (parent) {
-                                      const fallback = parent.querySelector('.logo-fallback');
-                                      if (fallback) (fallback as HTMLElement).style.display = 'none';
+                                      parent.innerHTML = `<span class="text-slate-800 font-bold text-xs">${stock.ticker.charAt(0)}</span>`;
                                     }
                                   }}
                                 />
+                              ) : (
+                                <span className="text-slate-800 font-bold text-xs">
+                                  {stock.ticker.charAt(0)}
+                                </span>
                               )}
-                              {/* Fallback letter - only shown if logo fails or doesn't exist */}
-                              <span className={`logo-fallback absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs ${stock.logoUrl ? 'hidden' : 'flex'}`}>
-                                {stock.ticker.charAt(0)}
-                              </span>
                             </div>
                           </div>
                           
