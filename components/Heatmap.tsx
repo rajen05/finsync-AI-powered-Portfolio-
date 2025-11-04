@@ -66,6 +66,7 @@ const Heatmap: React.FC = () => {
   };
 
   // Calculate total market cap for sizing
+  // hope this works 
   const totalMarketCap = useMemo(() => {
     if (!heatmapData) return 0;
     return heatmapData.reduce((sum, stock) => sum + stock.marketCap, 0);
