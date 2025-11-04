@@ -121,16 +121,16 @@ const Heatmap: React.FC = () => {
 
       {/* TradingView-style Treemap */}
       <div 
-        className="bg-slate-950 p-1" 
+        className="bg-slate-950 p-1 overflow-y-auto overflow-x-hidden" 
         style={{ 
-          height: 'calc(100vh - 180px)',
-          overflow: 'hidden'
+          height: 'calc(100vh - 180px)'
         }}
       >
-        <div className="grid gap-1 h-full" style={{
+        <div className="grid gap-1" style={{
           gridTemplateColumns: 'repeat(5, 1fr)',
-          gridAutoRows: '1fr',
-          gridAutoFlow: 'dense'
+          gridAutoRows: 'minmax(120px, auto)',
+          gridAutoFlow: 'dense',
+          minHeight: '100%'
         }}>
           {Object.entries(sectors)
             .sort(([, a], [, b]) => {
