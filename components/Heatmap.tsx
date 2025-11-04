@@ -220,20 +220,40 @@ const Heatmap: React.FC = () => {
                           {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                         </div>
 
-                        {/* Tooltip */}
-                        <div className="absolute hidden group-hover:block bg-slate-900 text-white text-xs p-2 rounded shadow-2xl z-[100] w-40 border border-slate-600 pointer-events-none" 
-                          style={{top: '100%', marginTop: '4px', left: '50%', transform: 'translateX(-50%)'}}>
-                          <div className="font-bold mb-1 truncate">{stock.companyName}</div>
-                          <div className="text-slate-300 space-y-0.5 text-[10px]">
-                            <div className="flex justify-between">
-                              <span>Cap:</span>
-                              <span className="text-white font-semibold">${(stock.marketCap / 1e9).toFixed(1)}B</span>
+                        {/* Tooltip - Fixed positioning */}
+                        <div className="absolute hidden group-hover:flex flex-col bg-slate-900/95 backdrop-blur-sm text-white text-xs p-3 rounded-lg shadow-2xl border border-slate-600 pointer-events-none z-[9999]" 
+                          style={{
+                            bottom: '100%', 
+                            marginBottom: '8px', 
+                            left: '50%', 
+                            transform: 'translateX(-50%)',
+                            minWidth: '160px',
+                            maxWidth: '200px'
+                          }}>
+                          {/* Arrow pointing down */}
+                          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px">
+                            <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-slate-600"></div>
+                          </div>
+                          
+                          <div className="font-bold text-sm mb-2">{stock.companyName}</div>
+                          <div className="space-y-1 text-[11px]">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-400">Ticker:</span>
+                              <span className="text-white font-semibold">{stock.ticker}</span>
                             </div>
-                            <div className="flex justify-between">
-                              <span>Change:</span>
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-400">Market Cap:</span>
+                              <span className="text-white font-semibold">${(stock.marketCap / 1e9).toFixed(2)}B</span>
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-400">Change:</span>
                               <span className={`font-bold ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
                                 {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                               </span>
+                            </div>
+                            <div className="flex justify-between items-center pt-1 border-t border-slate-700">
+                              <span className="text-slate-400">Sector:</span>
+                              <span className="text-white text-[10px]">{sectorName}</span>
                             </div>
                           </div>
                         </div>
