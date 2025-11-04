@@ -160,19 +160,19 @@ const Heatmap: React.FC = () => {
               return (
                 <div 
                   key={sectorName} 
-                  className="border border-slate-700 relative overflow-hidden bg-slate-900/30"
+                  className="border-2 border-slate-700 relative bg-slate-900/30 flex flex-col"
                   style={{
                     gridColumn: `span ${colSpan}`,
                     gridRow: `span ${rowSpan}`
                   }}
                 >
-                  {/* Sector Label */}
-                  <div className="absolute top-1 left-1 text-[9px] font-semibold text-white bg-black/70 px-1.5 py-0.5 rounded z-20">
+                  {/* Sector Label - Outside content area */}
+                  <div className="bg-slate-800 border-b border-slate-700 px-2 py-0.5 text-[9px] font-semibold text-white/90 flex-shrink-0">
                     {sectorName} →
                   </div>
                   
                   {/* Stock Tiles Grid */}
-                  <div className="grid gap-0.5 w-full h-full p-0.5" style={{
+                  <div className="grid gap-0.5 flex-1 p-0.5" style={{
                     gridTemplateColumns: colSpan > 1 ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
                     gridAutoRows: 'minmax(55px, 1fr)'
                   }}>

@@ -358,13 +358,16 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
         return cachedData;
     }
     
-    // Top 50 S&P 500 stocks by market cap
+    // Top 80 S&P 500 stocks by market cap - more stocks to fill grid
     const topTickers = [
         'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'V', 'UNH',
         'XOM', 'JNJ', 'WMT', 'JPM', 'MA', 'PG', 'CVX', 'HD', 'MRK', 'ABBV',
         'KO', 'PEP', 'COST', 'AVGO', 'LLY', 'MCD', 'TMO', 'CSCO', 'ACN', 'ADBE',
         'NKE', 'DIS', 'NFLX', 'CMCSA', 'VZ', 'INTC', 'AMD', 'CRM', 'ORCL', 'TXN',
-        'BA', 'CAT', 'UPS', 'HON', 'NEE', 'LIN', 'DHR', 'PM', 'ABT', 'BMY'
+        'BA', 'CAT', 'UPS', 'HON', 'NEE', 'LIN', 'DHR', 'PM', 'ABT', 'BMY',
+        'QCOM', 'RTX', 'SBUX', 'INTU', 'AMGN', 'LOW', 'SPGI', 'GE', 'NOW', 'BKNG',
+        'GILD', 'AXP', 'BLK', 'MDLZ', 'ISRG', 'TJX', 'MMM', 'CVS', 'PLD', 'CB',
+        'SYK', 'CI', 'ZTS', 'MO', 'REGN', 'VRTX', 'DUK', 'SO', 'PNC', 'USB'
     ];
     
     // Priority 1: Try Yahoo Finance via serverless API
@@ -451,19 +454,25 @@ function getSectorForTicker(ticker: string): string {
         'AAPL': 'Technology', 'MSFT': 'Technology', 'GOOGL': 'Technology', 'NVDA': 'Technology',
         'META': 'Technology', 'AVGO': 'Technology', 'CSCO': 'Technology', 'ADBE': 'Technology',
         'CRM': 'Technology', 'ORCL': 'Technology', 'INTC': 'Technology', 'AMD': 'Technology',
-        'TXN': 'Technology', 'ACN': 'Technology',
+        'TXN': 'Technology', 'ACN': 'Technology', 'QCOM': 'Technology', 'INTU': 'Technology',
+        'NOW': 'Technology',
         
         // Consumer Discretionary
         'AMZN': 'Consumer Discretionary', 'TSLA': 'Consumer Discretionary', 'HD': 'Consumer Discretionary',
-        'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary',
+        'MCD': 'Consumer Discretionary', 'NKE': 'Consumer Discretionary', 'SBUX': 'Consumer Discretionary',
+        'LOW': 'Consumer Discretionary', 'BKNG': 'Consumer Discretionary', 'TJX': 'Consumer Discretionary',
         
         // Healthcare
         'JNJ': 'Healthcare', 'UNH': 'Healthcare', 'MRK': 'Healthcare', 'ABBV': 'Healthcare',
         'LLY': 'Healthcare', 'TMO': 'Healthcare', 'ABT': 'Healthcare', 'DHR': 'Healthcare',
-        'BMY': 'Healthcare',
+        'BMY': 'Healthcare', 'AMGN': 'Healthcare', 'GILD': 'Healthcare', 'ISRG': 'Healthcare',
+        'CVS': 'Healthcare', 'CI': 'Healthcare', 'ZTS': 'Healthcare', 'REGN': 'Healthcare',
+        'VRTX': 'Healthcare', 'SYK': 'Healthcare',
         
         // Financials
         'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BRK.B': 'Financials',
+        'AXP': 'Financials', 'BLK': 'Financials', 'SPGI': 'Financials', 'CB': 'Financials',
+        'PNC': 'Financials', 'USB': 'Financials',
         
         // Energy
         'XOM': 'Energy', 'CVX': 'Energy',
@@ -471,14 +480,16 @@ function getSectorForTicker(ticker: string): string {
         // Consumer Staples
         'WMT': 'Consumer Staples', 'PG': 'Consumer Staples', 'KO': 'Consumer Staples',
         'PEP': 'Consumer Staples', 'COST': 'Consumer Staples', 'PM': 'Consumer Staples',
+        'MDLZ': 'Consumer Staples', 'MO': 'Consumer Staples',
         
-        // Communication Services
+        // Communication
         'DIS': 'Communication', 'NFLX': 'Communication', 'CMCSA': 'Communication',
         'VZ': 'Communication',
         
         // Industrials
         'BA': 'Industrials', 'CAT': 'Industrials', 'UPS': 'Industrials', 'HON': 'Industrials',
-        'NEE': 'Industrials', 'LIN': 'Industrials'
+        'NEE': 'Industrials', 'LIN': 'Industrials', 'RTX': 'Industrials', 'GE': 'Industrials',
+        'MMM': 'Industrials', 'PLD': 'Industrials', 'DUK': 'Industrials', 'SO': 'Industrials'
     };
     return sectorMap[ticker] || 'Other';
 }
