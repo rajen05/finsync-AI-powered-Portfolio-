@@ -151,7 +151,13 @@ const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => 
         </div>
 
         <div className="md:col-span-2 bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
-          <h3 className="text-lg font-semibold text-white mb-4">AI-Powered Analysis (Gemini)</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+            <h3 className="text-lg font-semibold text-white">AI-Powered Analysis</h3>
+            <span className="text-xs px-2 py-1 bg-purple-900/50 text-purple-300 rounded-full">Gemini AI</span>
+          </div>
           {analysisLoading ? (
             <div className="space-y-3 animate-pulse">
                 <div className="h-4 bg-slate-700 rounded w-1/4"></div>
@@ -162,7 +168,20 @@ const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => 
                 <div className="h-4 bg-slate-700 rounded w-3/4"></div>
             </div>
           ) : (
-            <div className="prose prose-invert prose-sm max-w-none">
+            <div className="prose prose-invert prose-sm max-w-none 
+              [&>h1]:text-xl [&>h1]:font-bold [&>h1]:text-white [&>h1]:mb-3 [&>h1]:mt-4
+              [&>h2]:text-lg [&>h2]:font-semibold [&>h2]:text-white [&>h2]:mb-2 [&>h2]:mt-3
+              [&>h3]:text-base [&>h3]:font-semibold [&>h3]:text-blue-400 [&>h3]:mb-2 [&>h3]:mt-3
+              [&>p]:text-slate-300 [&>p]:leading-relaxed [&>p]:mb-3
+              [&>ul]:list-disc [&>ul]:ml-6 [&>ul]:mb-3 [&>ul]:text-slate-300
+              [&>ol]:list-decimal [&>ol]:ml-6 [&>ol]:mb-3 [&>ol]:text-slate-300
+              [&>li]:mb-1
+              [&>strong]:text-white [&>strong]:font-semibold
+              [&>em]:text-blue-300 [&>em]:italic
+              [&>blockquote]:border-l-4 [&>blockquote]:border-blue-500 [&>blockquote]:pl-4 [&>blockquote]:italic [&>blockquote]:text-slate-400
+              [&>code]:bg-slate-900 [&>code]:px-1 [&>code]:py-0.5 [&>code]:rounded [&>code]:text-sm [&>code]:text-blue-300
+              [&>hr]:border-slate-700 [&>hr]:my-4
+            ">
               <ReactMarkdown>{analysis}</ReactMarkdown>
             </div>
           )}

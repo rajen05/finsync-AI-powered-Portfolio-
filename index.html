@@ -46,6 +46,26 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
+      
+      /* Hide page breaks in prose content */
+      .prose :where(hr):not(:where([class~="not-prose"] *)) {
+        display: none;
+      }
+      
+      /* Prevent page breaks */
+      @media print {
+        * {
+          page-break-inside: avoid;
+        }
+      }
+      
+      /* Hide any pagination elements */
+      [class*="page-"],
+      [class*="pagination"],
+      .page-break,
+      .pagebreak {
+        display: none !important;
+      }
     </style>
 </head>
   <body class="font-sans">
