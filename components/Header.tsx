@@ -23,7 +23,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
               <div className="flex items-center">
-                <img src="/icon/Finsync.png" alt="FinSync Logo" className="h-8 w-8" />
+                <img src="./icon/Finsync.png" alt="FinSync Logo" className="h-8 w-8" />
                 <h1 className="text-xl font-bold ml-3">FinSync</h1>
               </div>
               
