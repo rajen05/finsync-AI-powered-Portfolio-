@@ -227,13 +227,15 @@ const Heatmap: React.FC = () => {
 
                         {/* Tooltip */}
                         <div 
-                          className="absolute hidden group-hover:block bg-slate-900/98 backdrop-blur-sm text-white text-xs p-3 rounded-lg shadow-2xl border border-slate-600 min-w-[200px]"
+                          className="fixed hidden group-hover:flex flex-col bg-slate-900 text-white text-xs p-3 rounded-lg shadow-2xl border-2 border-slate-500"
                           style={{ 
                             pointerEvents: 'none',
-                            zIndex: 99999,
-                            left: '110%',
-                            top: '0',
-                            marginLeft: '8px'
+                            zIndex: 999999,
+                            top: '120px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            minWidth: '220px',
+                            maxWidth: '280px'
                           }}
                         >
                           <div className="font-bold text-sm mb-2 border-b border-slate-700 pb-1">{stock.companyName}</div>
