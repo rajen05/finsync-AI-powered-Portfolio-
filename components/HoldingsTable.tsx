@@ -47,26 +47,26 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings, isLoading, onRo
   );
 
   return (
-    <div className="bg-slate-800 rounded-lg shadow-lg overflow-hidden border border-slate-700">
-      <h2 className="text-lg font-semibold text-white px-6 py-4 border-b border-slate-700">Holdings</h2>
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg overflow-hidden border border-gray-200 dark:border-slate-700 transition-colors">
+      <h2 className="text-lg font-semibold text-gray-900 dark:text-white px-6 py-4 border-b border-gray-200 dark:border-slate-700">Holdings</h2>
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-slate-700">
-          <thead className="bg-slate-800">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+          <thead className="bg-gray-50 dark:bg-slate-800">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider"></th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Asset</th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Quantity</th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Avg. Cost</th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Market Value</th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-slate-400 uppercase tracking-wider">Unrealized P&L</th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider"></th>
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Asset</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Quantity</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Avg. Cost</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Market Value</th>
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-gray-600 dark:text-slate-400 uppercase tracking-wider">Unrealized P&L</th>
             </tr>
           </thead>
-          <tbody className="bg-slate-800 divide-y divide-slate-700">
+          <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
             {isLoading && renderSkeleton()}
             {!isLoading && holdings.map((holding) => (
               <tr 
                 key={holding.ticker} 
-                className="hover:bg-slate-700/50 cursor-pointer"
+                className="hover:bg-gray-50 dark:hover:bg-slate-700/50 cursor-pointer transition-colors"
                 onClick={() => onRowClick(holding.ticker)}
                 onMouseEnter={() => prefetchStockDetails(holding.ticker)}
               >
@@ -76,15 +76,15 @@ const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings, isLoading, onRo
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-white">{holding.ticker}</div>
+                  <div className="text-sm font-medium text-gray-900 dark:text-white">{holding.ticker}</div>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-slate-300">{holding.quantity.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium text-gray-900 dark:text-white">{holding.quantity.toLocaleString(undefined, { maximumFractionDigits: 6 })}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-slate-300">{formatCurrency(holding.averageCost)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm text-white font-semibold">{formatCurrency(holding.marketValue)}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm">{renderPL(holding.unrealizedPL, holding.unrealizedPLPercent)}</td>
               </tr>
             ))}
-             {!isLoading && holdings.length === 0 && (
+            {!isLoading && holdings.length === 0 && (
               <tr>
                 <td colSpan={6} className="text-center py-10 text-slate-500">
                   You have no holdings. Add a transaction to get started.

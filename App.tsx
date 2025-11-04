@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Transaction, AssetType, TransactionType } from './types';
 import { MarketDataProvider } from './context/MarketDataProvider';
+import { ThemeProvider } from './context/ThemeContext';
 import { Dashboard } from './components/Dashboard';
 
 const initialTransactions: Transaction[] = [
@@ -45,14 +46,16 @@ const App: React.FC = () => {
   }, [transactions]);
 
   return (
-    <div className="bg-slate-900 text-white min-h-screen">
-      <MarketDataProvider portfolioTickers={portfolioTickers}>
-        <Dashboard 
-          transactions={transactions}
-          onAddTransaction={handleAddTransaction}
-        />
-      </MarketDataProvider>
-    </div>
+    <ThemeProvider>
+      <div className="bg-white dark:bg-slate-900 text-gray-900 dark:text-white min-h-screen transition-colors">
+        <MarketDataProvider portfolioTickers={portfolioTickers}>
+          <Dashboard 
+            transactions={transactions}
+            onAddTransaction={handleAddTransaction}
+          />
+        </MarketDataProvider>
+      </div>
+    </ThemeProvider>
   );
 }
 

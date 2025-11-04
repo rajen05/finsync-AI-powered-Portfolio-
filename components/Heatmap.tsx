@@ -7,6 +7,8 @@ const Heatmap: React.FC = () => {
   const { heatmapData, isLoading, error, refreshData } = useMarketData();
   const [dataSource, setDataSource] = useState<string>('Loading...');
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [hoveredStock, setHoveredStock] = useState<HeatmapStock | null>(null);
+  const [hoveredSector, setHoveredSector] = useState<string>('');
 
   // Detect data source from console logs
   useEffect(() => {
@@ -89,12 +91,12 @@ const Heatmap: React.FC = () => {
   }
 
   return (
-    <div className="bg-slate-900 rounded-lg shadow-lg border border-slate-700 overflow-hidden">
+    <div className="bg-white dark:bg-slate-900 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 overflow-hidden transition-colors">
       {/* Compact Header */}
-      <div className="bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center justify-between">
+      <div className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 px-4 py-2 flex items-center justify-between transition-colors">
         <div>
-          <h2 className="text-lg font-bold text-white">Market Heatmap</h2>
-          <p className="text-xs text-slate-400">Size: Market Cap • Color: % Change</p>
+          <h2 className="text-lg font-bold text-gray-900 dark:text-white">Market Heatmap</h2>
+          <p className="text-xs text-gray-600 dark:text-slate-400">Size: Market Cap • Color: % Change</p>
         </div>
         
         <div className="flex items-center gap-4">
@@ -112,13 +114,51 @@ const Heatmap: React.FC = () => {
           </button>
           
           {/* Data Source Indicator */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full">
+          <div className="flex items-center gap-2 px-3 py-1 bg-gray-200 dark:bg-slate-700 rounded-full transition-colors">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-xs text-slate-300 font-medium">{dataSource}</span>
-            <span className="text-xs text-slate-500">• {heatmapData?.length || 0} stocks</span>
+            <span className="text-xs text-gray-700 dark:text-slate-300 font-medium">{dataSource}</span>
+            <span className="text-xs text-gray-500 dark:text-slate-500">• {heatmapData?.length || 0} stocks</span>
           </div>
         </div>
       </div>
+
+      {/* Global Popup Tooltip - Outside grid to prevent duplicates */}
+      {hoveredStock && (
+        <div 
+          className="fixed bg-slate-900/98 backdrop-blur-md text-white rounded-lg shadow-2xl border border-slate-500 pointer-events-none"
+          style={{ 
+            zIndex: 9999999,
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            padding: '20px',
+            minWidth: '300px'
+          }}
+        >
+          {/* Ticker */}
+          <div className="font-bold text-xl mb-4 pb-3 border-b border-slate-700">
+            {hoveredStock.ticker}
+          </div>
+          
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <div className="text-slate-400 text-xs mb-1">Price</div>
+              <div className="font-bold text-base">309.66</div>
+            </div>
+            <div>
+              <div className="text-slate-400 text-xs mb-1">Market Cap</div>
+              <div className="font-bold text-base">${(hoveredStock.marketCap / 1e9).toFixed(2)}B</div>
+            </div>
+            <div className="col-span-2 pt-2 border-t border-slate-700">
+              <div className="text-slate-400 text-xs mb-1">Change</div>
+              <div className={`font-bold text-2xl ${hoveredStock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                {hoveredStock.changePercent > 0 ? '+' : ''}{hoveredStock.changePercent.toFixed(2)}%
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* TradingView-style Treemap */}
       <div 
@@ -188,14 +228,20 @@ const Heatmap: React.FC = () => {
                       return (
                         <div
                           key={stock.ticker}
-                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-2 flex flex-col justify-between relative group border border-black/20`}
+                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-2 flex flex-col justify-between relative border border-black/20`}
                           style={{
                             gridColumn: isLarge ? 'span 2' : 'span 1',
                             gridRow: isLarge ? 'span 2' : 'span 1',
-                            minHeight: '60px',
-                            overflow: 'visible'
+                            minHeight: '60px'
                           }}
-                          title={`${stock.companyName} - ${stock.ticker}\nMarket Cap: $${(stock.marketCap / 1e9).toFixed(2)}B\nChange: ${stock.changePercent > 0 ? '+' : ''}${stock.changePercent.toFixed(2)}%`}
+                          onMouseEnter={() => {
+                            setHoveredStock(stock);
+                            setHoveredSector(sectorName);
+                          }}
+                          onMouseLeave={() => {
+                            setHoveredStock(null);
+                            setHoveredSector('');
+                          }}
                         >
                         {/* Ticker and Logo */}
                         <div className="flex items-start justify-between gap-1">
@@ -224,45 +270,6 @@ const Heatmap: React.FC = () => {
                         {/* Percentage */}
                         <div className="font-bold text-sm mt-auto" style={{textShadow: '0 1px 2px rgba(0,0,0,0.6)'}}>
                           {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
-                        </div>
-
-                        {/* Tooltip */}
-                        <div 
-                          className="fixed hidden group-hover:block bg-slate-800/95 backdrop-blur-md text-white p-4 rounded-xl shadow-2xl border-2 border-blue-500"
-                          style={{ 
-                            pointerEvents: 'none',
-                            zIndex: 9999999,
-                            top: '80px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            width: '320px'
-                          }}
-                        >
-                          <div className="font-bold text-base mb-3 pb-2 border-b-2 border-slate-600 text-white">
-                            {stock.companyName}
-                          </div>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-300">Symbol:</span>
-                              <span className="font-bold text-white">{stock.ticker}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-300">Sector:</span>
-                              <span className="font-semibold text-white">{sectorName}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-300">Market Cap:</span>
-                              <span className="font-bold text-white">
-                                {stock.marketCap > 0 ? `$${(stock.marketCap / 1e9).toFixed(2)}B` : 'N/A'}
-                              </span>
-                            </div>
-                            <div className="flex justify-between items-center pt-2 border-t border-slate-600">
-                              <span className="text-slate-300">Change:</span>
-                              <span className={`font-bold text-lg ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
-                              </span>
-                            </div>
-                          </div>
                         </div>
                       </div>
                     );

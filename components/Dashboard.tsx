@@ -65,12 +65,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddTransac
 
   return (
     <>
-      <Header />
-      <Navbar currentPage={currentPage} setCurrentPage={setCurrentPage} />
+      <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold capitalize">{currentPage}</h1>
+          <h1 className="text-2xl font-semibold capitalize text-gray-900 dark:text-white">{currentPage}</h1>
           {currentPage !== 'market' && currentPage !== 'heatmap' && (
              <button
               onClick={() => setIsModalOpen(true)}

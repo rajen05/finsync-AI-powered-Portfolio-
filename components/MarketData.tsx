@@ -36,14 +36,14 @@ const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol }) => {
 
   return (
     <div className="space-y-6">
-      <div className="bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-700">
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 transition-colors">
         <form onSubmit={handleSearch} className="flex items-center">
           <input
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             placeholder="Search for a stock or crypto symbol (e.g. AAPL, BTC-USD)"
-            className="w-full bg-slate-700 border-slate-600 rounded-l-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full bg-gray-100 dark:bg-slate-700 border-gray-300 dark:border-slate-600 rounded-l-md shadow-sm py-2 px-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
           />
           <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-r-md inline-flex items-center transition-colors">
             <SearchIcon />
@@ -55,8 +55,8 @@ const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol }) => {
         <StockDetailView symbol={symbol} onBack={() => setSymbol(null)} />
       ) : (
         <>
-          <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
-            <h3 className="text-lg font-semibold text-white mb-4">Top Movers Today</h3>
+          <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 transition-colors">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Top Movers Today</h3>
             {isLoadingMovers && !topMovers && <p className="text-slate-400">Loading top movers...</p>}
             {errorMovers && <p className="text-red-500">{errorMovers}</p>}
             {!isLoadingMovers && topMovers && (
@@ -69,10 +69,10 @@ const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol }) => {
                       key={mover.ticker}
                       onClick={() => handleMoverClick(mover.ticker)}
                       onMouseEnter={() => prefetchStockDetails(mover.ticker)}
-                      className="bg-slate-700/50 p-4 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors"
+                      className="bg-gray-50 dark:bg-slate-700/50 p-4 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors border border-gray-200 dark:border-slate-600"
                     >
-                      <p className="font-bold text-white truncate">{mover.ticker}</p>
-                      <p className="text-sm text-slate-300 truncate">{mover.companyName}</p>
+                      <p className="font-bold text-gray-900 dark:text-white truncate">{mover.ticker}</p>
+                      <p className="text-sm text-gray-600 dark:text-slate-300 truncate">{mover.companyName}</p>
                       <p className="font-semibold text-white mt-2">${mover.price.toFixed(2)}</p>
                       <p className={`text-sm font-medium ${colorClass}`}>
                         {isPositive ? '+' : ''}{mover.change.toFixed(2)} ({isPositive ? '+' : ''}{mover.changePercent.toFixed(2)}%)

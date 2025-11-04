@@ -7,12 +7,12 @@ interface PortfolioSummaryProps {
 }
 
 const SummaryCard: React.FC<{ title: string; value: string | React.ReactNode; isLoading: boolean, className?: string }> = ({ title, value, isLoading, className }) => (
-  <div className={`bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700 ${className}`}>
+  <div className={`bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 transition-colors ${className}`}>
     <h3 className="text-sm font-medium text-slate-400 uppercase tracking-wider">{title}</h3>
     {isLoading ? (
       <div className="animate-pulse bg-slate-700 h-8 w-3/4 rounded-md mt-2"></div>
     ) : (
-      <p className="mt-1 text-3xl font-semibold text-white">{value}</p>
+      <p className="mt-1 text-3xl font-semibold text-gray-900 dark:text-white">{value}</p>
     )}
   </div>
 );

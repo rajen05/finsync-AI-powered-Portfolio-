@@ -19,64 +19,45 @@ const MarketNews: React.FC = () => {
   }, []);
 
   const fetchMarketNews = async () => {
+    setLoading(true);
     try {
-      // Mock news data with real external links
-      const mockNews: NewsArticle[] = [
-        {
-          title: "Tech Stocks Rally as AI Investments Surge",
-          source: "Financial Times",
-          url: "https://www.ft.com/technology",
-          publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          summary: "Major technology companies see significant gains as artificial intelligence investments continue to drive market sentiment.",
-          image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop"
-        },
-        {
-          title: "Federal Reserve Holds Interest Rates Steady",
-          source: "Bloomberg",
-          url: "https://www.bloomberg.com/markets",
-          publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
-          summary: "The Fed maintains current interest rate levels, citing stable inflation and strong employment data.",
-          image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=200&fit=crop"
-        },
-        {
-          title: "Energy Sector Sees Mixed Results Amid Oil Price Volatility",
-          source: "Reuters",
-          url: "https://www.reuters.com/business/energy",
-          publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-          summary: "Oil prices fluctuate as global demand concerns offset supply constraints, impacting energy stocks.",
-          image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400&h=200&fit=crop"
-        },
-        {
-          title: "Cryptocurrency Market Rebounds After Recent Selloff",
-          source: "CoinDesk",
-          url: "https://www.coindesk.com/markets",
-          publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-          summary: "Bitcoin and Ethereum recover losses as institutional investors return to the market.",
-          image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=200&fit=crop"
-        },
-        {
-          title: "Healthcare Stocks Gain on Breakthrough Drug Approvals",
-          source: "CNBC",
-          url: "https://www.cnbc.com/health-and-science",
-          publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
-          summary: "Major pharmaceutical companies announce FDA approvals for innovative treatments, boosting sector performance.",
-          image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=200&fit=crop"
-        },
-        {
-          title: "Retail Sales Beat Expectations in Latest Report",
-          source: "Wall Street Journal",
-          url: "https://www.wsj.com/news/markets",
-          publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-          summary: "Consumer spending remains robust, signaling continued economic strength despite inflation concerns.",
-          image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop"
-        }
-      ];
-
-      // Load immediately (no fake delay)
-      setNews(mockNews);
+      // Try to fetch from NewsAPI (you can get free API key from newsapi.org)
+      // For now, using RSS feed proxy as fallback
+      const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://feeds.finance.yahoo.com/rss/2.0/headline?s=^GSPC&region=US&lang=en-US');
+      const data = await response.json();
+      
+      if (data.status === 'ok' && data.items) {
+        const fetchedNews: NewsArticle[] = data.items.slice(0, 6).map((item: any) => ({
+          title: item.title,
+          source: 'Yahoo Finance',
+          url: item.link,
+          publishedAt: item.pubDate,
+          summary: item.description?.replace(/<[^>]*>/g, '').substring(0, 150) + '...' || 'Market news update',
+          image: item.thumbnail || 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop'
+        }));
+        
+        setNews(fetchedNews);
+      } else {
+        throw new Error('Failed to fetch news');
+      }
+      
       setLoading(false);
     } catch (error) {
       console.error('Error fetching news:', error);
+      
+      // Fallback to basic market news if API fails
+      const fallbackNews: NewsArticle[] = [
+        {
+          title: "Market Update - Refresh to get latest news",
+          source: "Market Data",
+          url: "https://finance.yahoo.com/markets",
+          publishedAt: new Date().toISOString(),
+          summary: "Click refresh to fetch the latest market news from Yahoo Finance.",
+          image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop"
+        }
+      ];
+      
+      setNews(fallbackNews);
       setLoading(false);
     }
   };
@@ -117,15 +98,24 @@ const MarketNews: React.FC = () => {
     );
   }
 
+  const handleRefresh = () => {
+    setLoading(true);
+    fetchMarketNews();
+  };
+
   return (
-    <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+    <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 transition-colors">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-white">Market News</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Market News</h2>
         <button 
-          onClick={fetchMarketNews}
-          className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+          onClick={handleRefresh}
+          disabled={loading}
+          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 rounded-lg transition-colors text-sm font-medium"
         >
-          Refresh
+          <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span className="text-xs">Refresh</span>
         </button>
       </div>
 
@@ -136,36 +126,17 @@ const MarketNews: React.FC = () => {
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group bg-slate-700/50 rounded-lg overflow-hidden hover:bg-slate-700 transition-all hover:scale-[1.02] border border-slate-600/50 hover:border-slate-500"
+            className="bg-gray-50 dark:bg-slate-700 rounded-lg overflow-hidden hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors cursor-pointer border border-gray-200 dark:border-slate-600"
           >
-            {/* Image */}
             {article.image && (
-              <div className="relative h-32 overflow-hidden bg-slate-600">
-                <img 
-                  src={article.image} 
-                  alt={article.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                  }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
-              </div>
+              <img src={article.image} alt={article.title} className="w-full h-40 object-cover" />
             )}
-
-            {/* Content */}
             <div className="p-4">
-              <h3 className="text-white font-semibold text-sm mb-2 line-clamp-2 group-hover:text-blue-400 transition-colors">
-                {article.title}
-              </h3>
-              
-              <p className="text-slate-400 text-xs mb-3 line-clamp-2">
-                {article.summary}
-              </p>
-
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-2 line-clamp-2">{article.title}</h3>
+              <p className="text-sm text-gray-600 dark:text-slate-400 mb-3 line-clamp-2">{article.summary}</p>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-slate-500 font-medium">{article.source}</span>
-                <span className="text-slate-600">{formatTimeAgo(article.publishedAt)}</span>
+                <span className="text-gray-500 dark:text-slate-500 font-medium">{article.source}</span>
+                <span className="text-gray-400 dark:text-slate-600">{formatTimeAgo(article.publishedAt)}</span>
               </div>
             </div>
           </a>
@@ -174,7 +145,10 @@ const MarketNews: React.FC = () => {
 
       {/* View More */}
       <div className="mt-6 text-center">
-        <button className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors">
+        <button 
+          onClick={() => window.open('https://www.cnbc.com/markets/', '_blank')}
+          className="text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors hover:underline cursor-pointer"
+        >
           View More News →
         </button>
       </div>
