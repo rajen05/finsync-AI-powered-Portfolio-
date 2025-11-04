@@ -121,16 +121,12 @@ const Heatmap: React.FC = () => {
 
       {/* TradingView-style Treemap */}
       <div 
-        className="p-0.5 bg-slate-950 overflow-auto" 
+        className="p-0.5 bg-slate-950 overflow-hidden" 
         style={{ 
           height: 'calc(100vh - 180px)'
         }}
       >
-        <div className="grid gap-0.5" style={{ 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-          gridAutoRows: 'minmax(150px, auto)',
-          height: '100%'
-        }}>
+        <div className="flex flex-wrap gap-0.5 h-full content-start">
           {Object.entries(sectors)
             .sort(([, a], [, b]) => {
               const sumA = a.reduce((sum, s) => sum + s.marketCap, 0);
@@ -142,18 +138,35 @@ const Heatmap: React.FC = () => {
               const totalSectorCap = sortedStocks.reduce((sum, s) => sum + s.marketCap, 0);
               const sectorPercentage = (totalSectorCap / totalMarketCap) * 100;
               
-              // Calculate grid span based on sector size
-              const colSpan = sectorPercentage > 25 ? 2 : 1;
-              const rowSpan = sectorPercentage > 20 ? 2 : 1;
+              // Calculate flexible sizing based on sector percentage
+              let minWidth = '200px';
+              let minHeight = '140px';
+              let flexBasis = '20%';
+              
+              if (sectorPercentage > 25) {
+                minWidth = '320px';
+                minHeight = '200px';
+                flexBasis = '35%';
+              } else if (sectorPercentage > 15) {
+                minWidth = '260px';
+                minHeight = '170px';
+                flexBasis = '28%';
+              } else if (sectorPercentage > 8) {
+                minWidth = '220px';
+                minHeight = '150px';
+                flexBasis = '23%';
+              }
 
               return (
                 <div 
                   key={sectorName} 
                   className="border border-slate-700/60 relative bg-slate-900/40"
                   style={{
-                    gridColumn: `span ${colSpan}`,
-                    gridRow: `span ${rowSpan}`,
-                    minHeight: '150px',
+                    flexGrow: sectorPercentage,
+                    flexBasis: flexBasis,
+                    minWidth: minWidth,
+                    minHeight: minHeight,
+                    maxHeight: '280px',
                     display: 'flex',
                     flexDirection: 'column'
                   }}
@@ -169,36 +182,36 @@ const Heatmap: React.FC = () => {
                       const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
                       
                       // Calculate size based on market cap percentage
-                      let minWidth = '60px';
-                      let minHeight = '55px';
+                      let minWidth = '50px';
+                      let minHeight = '45px';
                       let flexGrow = stockPercentage;
                       let flexBasis = '0';
                       
                       if (stockPercentage > 30) {
                         // Very large stocks
-                        minWidth = '140px';
-                        minHeight = '120px';
-                        flexBasis = '35%';
+                        minWidth = '120px';
+                        minHeight = '90px';
+                        flexBasis = '38%';
                       } else if (stockPercentage > 20) {
                         // Large stocks
-                        minWidth = '110px';
-                        minHeight = '95px';
-                        flexBasis = '28%';
+                        minWidth = '95px';
+                        minHeight = '75px';
+                        flexBasis = '30%';
                       } else if (stockPercentage > 12) {
                         // Medium stocks
-                        minWidth = '85px';
-                        minHeight = '75px';
-                        flexBasis = '20%';
+                        minWidth = '75px';
+                        minHeight = '60px';
+                        flexBasis = '22%';
                       } else if (stockPercentage > 7) {
                         // Small-medium stocks
-                        minWidth = '70px';
-                        minHeight = '60px';
-                        flexBasis = '15%';
+                        minWidth = '60px';
+                        minHeight = '50px';
+                        flexBasis = '16%';
                       } else {
                         // Small stocks
-                        minWidth = '55px';
-                        minHeight = '50px';
-                        flexBasis = '12%';
+                        minWidth = '50px';
+                        minHeight = '45px';
+                        flexBasis = '13%';
                       }
                       
                       const isLargeStock = stockPercentage > 20;
