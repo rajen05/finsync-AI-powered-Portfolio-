@@ -2,6 +2,7 @@ import React from 'react';
 import { DollarIcon } from './icons/DollarIcon';
 import { useMarketData } from '../context/MarketDataProvider';
 import { useTheme } from '../context/ThemeContext';
+import FinSyncLogo from '../icon/Finsync.png';
 
 const API_KEY = (process.env.API_KEY || process.env.GEMINI_API_KEY);
 const hasApiKey = !!API_KEY;
@@ -23,7 +24,7 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
               <div className="flex items-center">
-                <img src="./icon/Finsync.png" alt="FinSync Logo" className="h-8 w-8" />
+                <img src={FinSyncLogo} alt="FinSync Logo" className="h-8 w-8" />
                 <h1 className="text-xl font-bold ml-3">FinSync</h1>
               </div>
               
