@@ -5,6 +5,20 @@ import { getFromCache, setInCache } from './cachingService';
 import { fetchCryptoPrices, isCrypto } from './cryptoService';
 import { fetchStockPricesWithFallback } from './stockService';
 
+// CORS proxy to bypass browser restrictions
+const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+
+// Helper function to fetch with CORS proxy
+async function fetchWithProxy(url: string) {
+    try {
+        const response = await fetch(CORS_PROXY + encodeURIComponent(url));
+        return response;
+    } catch (error) {
+        console.warn('CORS proxy failed, trying direct fetch...');
+        return fetch(url);
+    }
+}
+
 const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
 const hasApiKey = !!API_KEY;
 
@@ -123,12 +137,12 @@ export const fetchStockDetails = async (symbol: string): Promise<StockDetails> =
         return cachedData;
     }
 
-    console.log(`🔍 Fetching real data for ${symbol} from Yahoo Finance...`);
+    // Priority 1: Try Yahoo Finance with CORS proxy
+    console.log(`🔍 PRIMARY: Fetching ${symbol} from Yahoo Finance...`);
     
-    // Try Yahoo Finance first
     try {
         const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=30d`;
-        const response = await fetch(url);
+        const response = await fetchWithProxy(url);
         
         if (response.ok) {
             const data = await response.json();
@@ -143,7 +157,6 @@ export const fetchStockDetails = async (symbol: string): Promise<StockDetails> =
                 const change = currentPrice - previousClose;
                 const changePercent = (change / previousClose) * 100;
                 
-                // Build historical data
                 const historicalData = timestamps.map((ts: number, index: number) => ({
                     date: new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
                     price: parseFloat((prices[index] || 0).toFixed(2))
@@ -164,28 +177,28 @@ export const fetchStockDetails = async (symbol: string): Promise<StockDetails> =
                     historicalData: historicalData,
                     news: [
                         {
-                            headline: `${symbol.toUpperCase()} Trading Update`,
+                            headline: `${symbol.toUpperCase()} Market Update`,
                             url: `https://finance.yahoo.com/quote/${symbol}`,
                             source: 'Yahoo Finance',
-                            summary: `Latest market data and trading information for ${symbol.toUpperCase()}.`
+                            summary: `Latest trading data and market information for ${symbol.toUpperCase()}.`
                         }
                     ]
                 };
                 
-                console.log(`✅ Stock details fetched from Yahoo Finance for ${symbol}`);
+                console.log(`✅ PRIMARY SUCCESS: Stock details from Yahoo Finance for ${symbol}`);
                 setInCache(cacheKey, stockData);
                 return stockData;
             }
         }
     } catch (error) {
-        console.error(`❌ Yahoo Finance failed for ${symbol}:`, error);
+        console.error(`❌ PRIMARY FAILED: Yahoo Finance error for ${symbol}:`, error);
     }
     
-    // Fallback to Gemini AI
+    // Priority 2: Fallback to Gemini AI
     if (hasApiKey && ai) {
         try {
-            console.log(`🔄 Trying Gemini AI for ${symbol}...`);
-            const prompt = `Provide stock information for "${symbol}": company name, current price, day's change (value and percent), day's range, 52-week range, market cap, P/E ratio, dividend yield. Include last 30 days of daily closing prices and 5 recent news articles with headlines, URLs, sources, and brief summaries.`;
+            console.log(`🔄 SECONDARY: Trying Gemini AI for ${symbol}...`);
+            const prompt = `Provide stock information for "${symbol}": company name, current price, day's change, day's range, 52-week range, market cap, P/E ratio, dividend yield. Include last 30 days of daily closing prices and 5 recent news articles.`;
             
             const response = await ai.models.generateContent({
                 model: 'gemini-2.0-flash-exp',
@@ -198,12 +211,12 @@ export const fetchStockDetails = async (symbol: string): Promise<StockDetails> =
             
             const data = parseJsonResponse<StockDetails>(response.text, `stock details for ${symbol}`);
             if (data) {
-                console.log(`✅ Stock details fetched from Gemini AI for ${symbol}`);
+                console.log(`✅ SECONDARY SUCCESS: Stock details from Gemini AI for ${symbol}`);
                 setInCache(cacheKey, data);
                 return data;
             }
         } catch (error) {
-            console.error(`❌ Gemini AI also failed for ${symbol}:`, error);
+            console.error(`❌ SECONDARY FAILED: Gemini AI error for ${symbol}:`, error);
         }
     }
     
@@ -253,16 +266,16 @@ export const fetchTopMoversData = async (): Promise<TopMover[]> => {
         return cachedData;
     }
 
-    // Popular stocks to check for movers
     const popularTickers = ['NVDA', 'AMD', 'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NFLX', 'DIS'];
     
-    console.log('🔍 Fetching top movers from Yahoo Finance...');
+    // Priority 1: Try Yahoo Finance with CORS proxy
+    console.log('🔍 PRIMARY: Fetching top movers from Yahoo Finance...');
     
     try {
         const quotePromises = popularTickers.map(async (ticker) => {
             try {
                 const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-                const response = await fetch(url);
+                const response = await fetchWithProxy(url);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -284,7 +297,7 @@ export const fetchTopMoversData = async (): Promise<TopMover[]> => {
                     }
                 }
             } catch (err) {
-                console.warn(`Failed to fetch ${ticker}`);
+                console.warn(`Failed to fetch ${ticker} from Yahoo`);
             }
             return null;
         });
@@ -293,23 +306,24 @@ export const fetchTopMoversData = async (): Promise<TopMover[]> => {
         const validMovers = results.filter(m => m !== null) as TopMover[];
         
         if (validMovers.length >= 6) {
-            // Sort by absolute change percent and get top 6
             const sorted = validMovers.sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
             const topMovers = sorted.slice(0, 6);
             
-            console.log('✅ Top movers fetched from Yahoo Finance:', topMovers.length);
+            console.log('✅ PRIMARY SUCCESS: Top movers from Yahoo Finance:', topMovers.length);
             setInCache(cacheKey, topMovers);
             return topMovers;
+        } else {
+            console.warn(`⚠️ Yahoo Finance returned only ${validMovers.length} movers, trying Gemini...`);
         }
     } catch (error) {
-        console.error('❌ Yahoo Finance failed for top movers:', error);
+        console.error('❌ PRIMARY FAILED: Yahoo Finance error:', error);
     }
     
-    // Fallback to Gemini AI
+    // Priority 2: Fallback to Gemini AI
     if (hasApiKey && ai) {
         try {
-            console.log('🔄 Trying Gemini AI for top movers...');
-            const prompt = `List the top 6 market movers today from major US stocks. Include 3 top gainers and 3 top losers. For each: ticker, company name, current price, change value, and change percentage.`;
+            console.log('🔄 SECONDARY: Trying Gemini AI for top movers...');
+            const prompt = `List the top 6 market movers today from major US stocks. Include 3 top gainers and 3 top losers. For each: ticker, company name, current price, change value, change percentage.`;
             
             const response = await ai.models.generateContent({
                 model: 'gemini-2.0-flash-exp',
@@ -322,12 +336,12 @@ export const fetchTopMoversData = async (): Promise<TopMover[]> => {
             
             const data = parseJsonResponse<TopMover[]>(response.text, 'top movers');
             if (data && data.length > 0) {
-                console.log('✅ Top movers fetched from Gemini AI:', data.length);
+                console.log('✅ SECONDARY SUCCESS: Top movers from Gemini AI:', data.length);
                 setInCache(cacheKey, data);
                 return data;
             }
         } catch (error) {
-            console.error('❌ Gemini AI also failed for top movers:', error);
+            console.error('❌ SECONDARY FAILED: Gemini AI error:', error);
         }
     }
     
@@ -351,14 +365,14 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
         'BA', 'CAT', 'UPS', 'HON', 'NEE', 'LIN', 'DHR', 'PM', 'ABT', 'BMY'
     ];
     
-    console.log('🔍 Fetching real heatmap data from Yahoo Finance...');
+    // Priority 1: Try Yahoo Finance with CORS proxy
+    console.log('🔍 PRIMARY: Fetching heatmap data from Yahoo Finance...');
     
     try {
-        // Fetch quotes for all tickers in parallel
         const quotePromises = topTickers.map(async (ticker) => {
             try {
                 const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-                const response = await fetch(url);
+                const response = await fetchWithProxy(url);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -382,7 +396,7 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
                     }
                 }
             } catch (err) {
-                console.warn(`Failed to fetch ${ticker}`);
+                console.warn(`Failed to fetch ${ticker} from Yahoo`);
             }
             return null;
         });
@@ -390,20 +404,22 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
         const results = await Promise.all(quotePromises);
         const validStocks = results.filter(s => s !== null) as HeatmapStock[];
         
-        if (validStocks.length > 0) {
-            console.log('✅ Heatmap data fetched from Yahoo Finance:', validStocks.length, 'stocks');
+        if (validStocks.length >= 20) { // At least 20 stocks
+            console.log('✅ PRIMARY SUCCESS: Heatmap data from Yahoo Finance:', validStocks.length, 'stocks');
             setInCache(cacheKey, validStocks);
             return validStocks;
+        } else {
+            console.warn(`⚠️ Yahoo Finance returned only ${validStocks.length} stocks, trying Gemini...`);
         }
     } catch (error) {
-        console.error('❌ Yahoo Finance failed:', error);
+        console.error('❌ PRIMARY FAILED: Yahoo Finance error:', error);
     }
     
-    // If Yahoo fails, try Gemini AI (if API key available)
+    // Priority 2: Fallback to Gemini AI
     if (hasApiKey && ai) {
         try {
-            console.log('🔄 Trying Gemini AI as fallback...');
-            const prompt = `Generate data for a stock market heatmap. Provide a list of 50 major companies from diverse sectors. For each: ticker, company name, today's percentage change, market cap, sector.`;
+            console.log('🔄 SECONDARY: Trying Gemini AI as fallback...');
+            const prompt = `Generate data for a stock market heatmap. Provide a list of 50 major S&P 500 companies from diverse sectors. For each: ticker, company name, today's percentage change (realistic -5% to +5%), market cap, sector.`;
             
             const response = await ai.models.generateContent({
                 model: 'gemini-2.0-flash-exp',
@@ -416,16 +432,16 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
             
             const data = parseJsonResponse<HeatmapStock[]>(response.text, 'heatmap data');
             if (data && data.length > 0) {
-                console.log('✅ Heatmap data fetched from Gemini AI:', data.length, 'stocks');
+                console.log('✅ SECONDARY SUCCESS: Heatmap from Gemini AI:', data.length, 'stocks');
                 setInCache(cacheKey, data);
                 return data;
             }
         } catch (error) {
-            console.error('❌ Gemini AI also failed:', error);
+            console.error('❌ SECONDARY FAILED: Gemini AI error:', error);
         }
     }
     
-    throw new Error('All data sources failed. Please check your internet connection.');
+    throw new Error('All data sources failed. Yahoo Finance blocked and Gemini AI unavailable.');
 };
 
 // Helper function to map tickers to sectors

@@ -22,42 +22,15 @@ const StockChart: React.FC<StockChartProps> = ({ data, changePercent, symbol }) 
   const fetchHistoricalData = async (range: TimeRange) => {
     setLoading(true);
     try {
-      // Calculate date range
-      const endDate = new Date();
-      const startDate = new Date();
-      
-      switch (range) {
-        case '1D':
-          startDate.setDate(endDate.getDate() - 1);
-          break;
-        case '1W':
-          startDate.setDate(endDate.getDate() - 7);
-          break;
-        case '1M':
-          startDate.setMonth(endDate.getMonth() - 1);
-          break;
-        case '3M':
-          startDate.setMonth(endDate.getMonth() - 3);
-          break;
-        case '1Y':
-          startDate.setFullYear(endDate.getFullYear() - 1);
-          break;
-        case '5Y':
-          startDate.setFullYear(endDate.getFullYear() - 5);
-          break;
-        case 'All':
-          startDate.setFullYear(endDate.getFullYear() - 10);
-          break;
-      }
-
-      const fromTimestamp = Math.floor(startDate.getTime() / 1000);
-      const toTimestamp = Math.floor(endDate.getTime() / 1000);
-      
-      // Fetch from Yahoo Finance (no API key needed)
+      // Fetch from Yahoo Finance with CORS proxy
       const interval = range === '1D' ? '5m' : range === '1W' ? '1h' : '1d';
       const yahooRange = range === '1D' ? '1d' : range === '1W' ? '5d' : range === '1M' ? '1mo' : range === '3M' ? '3mo' : range === '1Y' ? '1y' : range === '5Y' ? '5y' : 'max';
       
-      const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${yahooRange}`;
+      const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${yahooRange}`;
+      const corsProxy = 'https://api.allorigins.win/raw?url=';
+      const url = corsProxy + encodeURIComponent(yahooUrl);
+      
+      console.log(`📊 Fetching ${range} data for ${symbol}...`);
       const response = await fetch(url);
       
       if (response.ok) {
@@ -77,18 +50,18 @@ const StockChart: React.FC<StockChartProps> = ({ data, changePercent, symbol }) 
             price: prices[index] || 0
           })).filter((d: any) => d.price > 0);
           
+          console.log(`✅ Chart data loaded: ${historicalData.length} data points`);
           setChartData(historicalData);
-        } else {
-          // Fallback to provided data
-          setChartData(data);
+          setLoading(false);
+          return;
         }
-      } else {
-        // Fallback to provided data
-        setChartData(data);
       }
+      
+      // If Yahoo fails, use the initial data
+      console.warn('⚠️ Yahoo Finance failed, using initial data');
+      setChartData(data);
     } catch (error) {
-      console.error('Error fetching historical data:', error);
-      // Fallback to provided data
+      console.error('❌ Error fetching chart data:', error);
       setChartData(data);
     } finally {
       setLoading(false);

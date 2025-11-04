@@ -1,10 +1,24 @@
 // TradingView-style treemap heatmap
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useMarketData } from '../context/MarketDataProvider';
 import { HeatmapStock } from '../types';
 
 const Heatmap: React.FC = () => {
   const { heatmapData, isLoading, error } = useMarketData();
+  const [dataSource, setDataSource] = useState<string>('Loading...');
+
+  // Detect data source from console logs
+  useEffect(() => {
+    if (heatmapData && heatmapData.length > 0) {
+      // Check localStorage to see if data was cached
+      const cached = localStorage.getItem('heatmap-data');
+      if (cached) {
+        setDataSource('Cached Data');
+      } else {
+        setDataSource('Live Data');
+      }
+    }
+  }, [heatmapData]);
 
   const sectors = useMemo(() => {
     if (!heatmapData) return {};
@@ -64,23 +78,33 @@ const Heatmap: React.FC = () => {
           <h2 className="text-lg font-bold text-white">Market Heatmap</h2>
           <p className="text-xs text-slate-400">Size: Market Cap • Color: % Change</p>
         </div>
-        {/* Inline Legend */}
-        <div className="flex items-center gap-3 text-xs">
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-500 rounded"></div>
-            <span className="text-slate-300">&gt;5%</span>
+        
+        <div className="flex items-center gap-6">
+          {/* Data Source Indicator */}
+          <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-xs text-slate-300 font-medium">{dataSource}</span>
+            <span className="text-xs text-slate-500">• {heatmapData?.length || 0} stocks</span>
           </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-green-700 rounded"></div>
-            <span className="text-slate-300">0-5%</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-red-700 rounded"></div>
-            <span className="text-slate-300">0-5%</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <div className="w-3 h-3 bg-red-500 rounded"></div>
-            <span className="text-slate-300">&lt;-5%</span>
+          
+          {/* Inline Legend */}
+          <div className="flex items-center gap-3 text-xs">
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-green-500 rounded"></div>
+              <span className="text-slate-300">&gt;5%</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-green-700 rounded"></div>
+              <span className="text-slate-300">0-5%</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-red-700 rounded"></div>
+              <span className="text-slate-300">0-5%</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-3 h-3 bg-red-500 rounded"></div>
+              <span className="text-slate-300">&lt;-5%</span>
+            </div>
           </div>
         </div>
       </div>
