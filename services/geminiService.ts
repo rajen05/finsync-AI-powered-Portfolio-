@@ -228,60 +228,8 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
         return cachedData;
     }
     
-    // Try to fetch from fast APIs first (works in production)
-    try {
-        console.log('🚀 Fetching real-time data from fast APIs...');
-        
-        // Use Finnhub to get top stocks data
-        const response = await fetch('https://finnhub.io/api/v1/stock/symbol?exchange=US&token=ct4a0j9r01qnhqrjrr1gct4a0j9r01qnhqrjrr20');
-        
-        if (response.ok) {
-            const symbols = await response.json();
-            // Get top 50 stocks by market cap (simplified)
-            const topTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'V', 'UNH', 
-                               'XOM', 'JNJ', 'WMT', 'JPM', 'MA', 'PG', 'CVX', 'HD', 'MRK', 'ABBV',
-                               'KO', 'PEP', 'COST', 'AVGO', 'LLY', 'MCD', 'TMO', 'CSCO', 'ACN', 'ADBE',
-                               'NKE', 'DIS', 'NFLX', 'CMCSA', 'VZ', 'INTC', 'AMD', 'CRM', 'ORCL', 'TXN',
-                               'BA', 'CAT', 'UPS', 'HON', 'NEE', 'LIN', 'DHR', 'PM', 'ABT', 'BMY'];
-            
-            // Fetch quotes for each ticker in parallel
-            const quotePromises = topTickers.map(async (ticker) => {
-                try {
-                    const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=ct4a0j9r01qnhqrjrr1gct4a0j9r01qnhqrjrr20`);
-                    const quote = await quoteRes.json();
-                    
-                    // Get company profile for sector info
-                    const profileRes = await fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=ct4a0j9r01qnhqrjrr1gct4a0j9r01qnhqrjrr20`);
-                    const profile = await profileRes.json();
-                    
-                    if (quote.c && quote.c > 0) {
-                        return {
-                            ticker: ticker,
-                            companyName: profile.name || ticker,
-                            changePercent: quote.dp || 0,
-                            marketCap: profile.marketCapitalization ? profile.marketCapitalization * 1000000 : 100000000000,
-                            sector: profile.finnhubIndustry || 'Technology',
-                            logoUrl: profile.logo || null
-                        };
-                    }
-                } catch (err) {
-                    console.warn(`Failed to fetch ${ticker}`);
-                }
-                return null;
-            });
-            
-            const results = await Promise.all(quotePromises);
-            const validStocks = results.filter(s => s !== null) as HeatmapStock[];
-            
-            if (validStocks.length > 0) {
-                console.log('✅ Real-time data fetched from Finnhub:', validStocks.length, 'stocks');
-                setInCache(cacheKey, validStocks);
-                return validStocks;
-            }
-        }
-    } catch (error) {
-        console.warn('⚠️ Fast APIs failed (likely CORS in local dev), using mock data:', error);
-    }
+    // Use mock data by default (fast and reliable)
+    // Real APIs will be enabled when you add proper backend/proxy
     
     // Fallback to mock data if APIs fail
     console.log('📦 Using mock data (API fallback)');
