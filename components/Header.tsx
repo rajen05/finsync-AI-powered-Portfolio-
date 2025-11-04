@@ -56,6 +56,14 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
                     Transactions
                   </button>
                   <button
+                    onClick={() => setCurrentPage('wishlist')}
+                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      currentPage === 'wishlist' ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50'
+                    }`}
+                  >
+                    Watchlist
+                  </button>
+                  <button
                     onClick={() => setCurrentPage('market')}
                     className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                       currentPage === 'market' ? 'bg-blue-600 text-white' : 'text-gray-700 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-700/50'

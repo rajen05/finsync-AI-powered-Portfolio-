@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Transaction, AssetType, TransactionType } from './types';
+import { Transaction, AssetType, TransactionType, WishlistItem } from './types';
 import { MarketDataProvider } from './context/MarketDataProvider';
 import { ThemeProvider } from './context/ThemeContext';
 import { Dashboard } from './components/Dashboard';
@@ -24,6 +24,16 @@ const App: React.FC = () => {
     }
   });
 
+  const [wishlist, setWishlist] = useState<WishlistItem[]>(() => {
+    try {
+      const savedWishlist = localStorage.getItem('portfolio-wishlist');
+      return savedWishlist ? JSON.parse(savedWishlist) : [];
+    } catch (error) {
+      console.error('Error reading wishlist from localStorage', error);
+      return [];
+    }
+  });
+
   useEffect(() => {
     try {
       localStorage.setItem('portfolio-transactions', JSON.stringify(transactions));
@@ -31,6 +41,14 @@ const App: React.FC = () => {
       console.error('Error saving transactions to localStorage', error);
     }
   }, [transactions]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('portfolio-wishlist', JSON.stringify(wishlist));
+    } catch (error) {
+      console.error('Error saving wishlist to localStorage', error);
+    }
+  }, [wishlist]);
   
   const handleAddTransaction = (newTransaction: Omit<Transaction, 'id'>) => {
     const transactionWithId: Transaction = {
@@ -40,10 +58,29 @@ const App: React.FC = () => {
     setTransactions(prev => [...prev, transactionWithId].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   };
 
+  const handleAddWishlistItem = (item: Omit<WishlistItem, 'id' | 'addedAt'>) => {
+    const newItem: WishlistItem = {
+      ...item,
+      id: new Date().getTime().toString(),
+      addedAt: new Date().toISOString(),
+    };
+    setWishlist(prev => [...prev, newItem]);
+  };
+
+  const handleRemoveWishlistItem = (id: string) => {
+    setWishlist(prev => prev.filter(item => item.id !== id));
+  };
+
+  const handleUpdateWishlistItem = (id: string, updates: Partial<WishlistItem>) => {
+    setWishlist(prev => prev.map(item => item.id === id ? { ...item, ...updates } : item));
+  };
+
   const portfolioTickers = useMemo(() => {
-    const tickers = new Set(transactions.map(t => t.ticker));
-    return Array.from(tickers);
-  }, [transactions]);
+    const transactionTickers = new Set(transactions.map(t => t.ticker));
+    const wishlistTickers = new Set(wishlist.map(w => w.ticker));
+    const allTickers = new Set([...transactionTickers, ...wishlistTickers]);
+    return Array.from(allTickers);
+  }, [transactions, wishlist]);
 
   return (
     <ThemeProvider>
@@ -52,6 +89,10 @@ const App: React.FC = () => {
           <Dashboard 
             transactions={transactions}
             onAddTransaction={handleAddTransaction}
+            wishlist={wishlist}
+            onAddWishlistItem={handleAddWishlistItem}
+            onRemoveWishlistItem={handleRemoveWishlistItem}
+            onUpdateWishlistItem={handleUpdateWishlistItem}
           />
         </MarketDataProvider>
       </div>

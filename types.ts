@@ -82,3 +82,16 @@ export interface HeatmapStock {
   sector: string;
   logoUrl?: string;
 }
+
+export interface WishlistItem {
+  id: string;
+  ticker: string;
+  assetType: AssetType;
+  targetPrice: number | null;
+  notes: string;
+  addedAt: string;
+  currentPrice?: number | null;
+  priceChange?: number | null;
+  priceChangePercent?: number | null;
+  alertTriggered?: boolean;
+}
