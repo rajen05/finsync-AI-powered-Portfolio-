@@ -228,36 +228,37 @@ const Heatmap: React.FC = () => {
 
                         {/* Tooltip */}
                         <div 
-                          className="fixed hidden group-hover:flex flex-col bg-slate-900 text-white text-xs p-3 rounded-lg shadow-2xl border-2 border-slate-500"
+                          className="fixed hidden group-hover:block bg-slate-800/95 backdrop-blur-md text-white p-4 rounded-xl shadow-2xl border-2 border-blue-500"
                           style={{ 
                             pointerEvents: 'none',
-                            zIndex: 999999,
-                            top: '120px',
+                            zIndex: 9999999,
+                            top: '80px',
                             left: '50%',
                             transform: 'translateX(-50%)',
-                            minWidth: '220px',
-                            maxWidth: '280px'
+                            width: '320px'
                           }}
                         >
-                          <div className="font-bold text-sm mb-2 border-b border-slate-700 pb-1">{stock.companyName}</div>
-                          <div className="space-y-1">
-                            <div className="flex justify-between gap-3">
-                              <span className="text-slate-400">Symbol:</span>
-                              <span className="font-semibold">{stock.ticker}</span>
+                          <div className="font-bold text-base mb-3 pb-2 border-b-2 border-slate-600 text-white">
+                            {stock.companyName}
+                          </div>
+                          <div className="space-y-2 text-sm">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-300">Symbol:</span>
+                              <span className="font-bold text-white">{stock.ticker}</span>
                             </div>
-                            <div className="flex justify-between gap-3">
-                              <span className="text-slate-400">Sector:</span>
-                              <span className="font-semibold text-[10px]">{sectorName}</span>
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-300">Sector:</span>
+                              <span className="font-semibold text-white">{sectorName}</span>
                             </div>
-                            <div className="flex justify-between gap-3">
-                              <span className="text-slate-400">Market Cap:</span>
-                              <span className="font-semibold">
+                            <div className="flex justify-between items-center">
+                              <span className="text-slate-300">Market Cap:</span>
+                              <span className="font-bold text-white">
                                 {stock.marketCap > 0 ? `$${(stock.marketCap / 1e9).toFixed(2)}B` : 'N/A'}
                               </span>
                             </div>
-                            <div className="flex justify-between gap-3">
-                              <span className="text-slate-400">Change:</span>
-                              <span className={`font-bold ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                            <div className="flex justify-between items-center pt-2 border-t border-slate-600">
+                              <span className="text-slate-300">Change:</span>
+                              <span className={`font-bold text-lg ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
                                 {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                               </span>
                             </div>
