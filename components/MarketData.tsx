@@ -1,0 +1,89 @@
+import React, { useState, useEffect } from 'react';
+import StockDetailView from './StockDetailView';
+import { SearchIcon } from './icons/SearchIcon';
+import { prefetchStockDetails } from '../services/geminiService';
+import { useMarketData } from '../context/MarketDataProvider';
+
+interface MarketDataProps {
+  symbol: string | null;
+  setSymbol: (symbol: string | null) => void;
+}
+
+const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol }) => {
+  const [inputValue, setInputValue] = useState('');
+  
+  const { topMovers, isLoading: isLoadingMovers, error: errorMovers } = useMarketData();
+
+  useEffect(() => {
+    // If a symbol is passed via props (e.g., from portfolio click), update the input.
+    if (symbol) {
+      setInputValue(symbol);
+    }
+  }, [symbol]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (inputValue) {
+      setSymbol(inputValue.toUpperCase());
+    }
+  };
+  
+  const handleMoverClick = (moverSymbol: string) => {
+      setInputValue(moverSymbol);
+      setSymbol(moverSymbol);
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-slate-800 p-4 rounded-lg shadow-lg border border-slate-700">
+        <form onSubmit={handleSearch} className="flex items-center">
+          <input
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder="Search for a stock or crypto symbol (e.g. AAPL, BTC-USD)"
+            className="w-full bg-slate-700 border-slate-600 rounded-l-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
+          <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-r-md inline-flex items-center transition-colors">
+            <SearchIcon />
+          </button>
+        </form>
+      </div>
+
+      {symbol ? (
+        <StockDetailView symbol={symbol} onBack={() => setSymbol(null)} />
+      ) : (
+        <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
+          <h3 className="text-lg font-semibold text-white mb-4">Top Movers Today</h3>
+          {isLoadingMovers && !topMovers && <p className="text-slate-400">Loading top movers...</p>}
+          {errorMovers && <p className="text-red-500">{errorMovers}</p>}
+          {!isLoadingMovers && topMovers && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {topMovers.map((mover) => {
+                const isPositive = mover.changePercent >= 0;
+                const colorClass = isPositive ? 'text-green-500' : 'text-red-500';
+                return (
+                  <div
+                    key={mover.ticker}
+                    onClick={() => handleMoverClick(mover.ticker)}
+                    onMouseEnter={() => prefetchStockDetails(mover.ticker)}
+                    className="bg-slate-700/50 p-4 rounded-lg cursor-pointer hover:bg-slate-700 transition-colors"
+                  >
+                    <p className="font-bold text-white truncate">{mover.ticker}</p>
+                    <p className="text-sm text-slate-300 truncate">{mover.companyName}</p>
+                    <p className="font-semibold text-white mt-2">${mover.price.toFixed(2)}</p>
+                    <p className={`text-sm font-medium ${colorClass}`}>
+                      {isPositive ? '+' : ''}{mover.change.toFixed(2)} ({isPositive ? '+' : ''}{mover.changePercent.toFixed(2)}%)
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MarketData;

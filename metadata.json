@@ -1,0 +1,5 @@
+{
+  "name": "PortFolio Sync",
+  "description": "A personal investment portfolio tracker for stocks and cryptocurrencies. Users can manually input transactions, track real-time performance, and analyze key metrics like P&L, cost basis, and asset allocation in a unified, responsive interface.",
+  "requestFramePermissions": []
+}

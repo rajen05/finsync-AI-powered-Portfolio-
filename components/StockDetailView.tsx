@@ -1,0 +1,152 @@
+import React, { useState, useEffect } from 'react';
+import { fetchStockDetails, getStockAnalysis } from '../services/geminiService';
+import { StockDetails } from '../types';
+import StockChart from './StockChart';
+import ReactMarkdown from 'react-markdown';
+
+interface StockDetailViewProps {
+  symbol: string;
+  onBack: () => void;
+}
+
+const Stat: React.FC<{ label: string; value: string | number | null | undefined }> = ({ label, value }) => (
+  <div className="flex justify-between py-2 border-b border-slate-700">
+    <span className="text-sm text-slate-400">{label}</span>
+    <span className="text-sm font-medium text-white">{value ?? 'N/A'}</span>
+  </div>
+);
+
+const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => {
+  const [details, setDetails] = useState<StockDetails | null>(null);
+  const [analysis, setAnalysis] = useState<string>('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [analysisLoading, setAnalysisLoading] = useState(true);
+
+  useEffect(() => {
+    const getDetails = async () => {
+      if (!symbol) return;
+      setLoading(true);
+      setAnalysisLoading(true);
+      setError(null);
+      setDetails(null);
+      setAnalysis('');
+
+      try {
+        const data = await fetchStockDetails(symbol);
+        setDetails(data);
+        if (data && data.news && data.news.length > 0) {
+          getStockAnalysis(data.ticker, data.companyName, data.news)
+            .then(setAnalysis)
+            .finally(() => setAnalysisLoading(false));
+        } else {
+            setAnalysis('Not enough recent news to generate an AI analysis.');
+            setAnalysisLoading(false);
+        }
+      } catch (err) {
+        setError(`Failed to fetch data for ${symbol}. The symbol may be incorrect or the API may be unavailable.`);
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    getDetails();
+  }, [symbol]);
+
+  if (loading) {
+    return (
+        <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700 min-h-[500px] flex items-center justify-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+    );
+  }
+
+  if (error) {
+    return <div className="text-center p-10 text-red-500 bg-slate-800 rounded-lg">{error}</div>;
+  }
+
+  if (!details) {
+    return <div className="text-center p-10 bg-slate-800 rounded-lg">No data available for {symbol}.</div>;
+  }
+
+  const isPositive = details.changePercent >= 0;
+  const colorClass = isPositive ? 'text-green-500' : 'text-red-500';
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
+        <div className="flex justify-between items-start mb-4">
+            <div className="flex items-center gap-4">
+                {details.logoUrl && <img src={details.logoUrl} alt={`${details.companyName} logo`} className="h-12 w-12 rounded-full bg-white p-1"/>}
+                <div>
+                    <h2 className="text-2xl font-bold text-white">{details.companyName} ({details.ticker})</h2>
+                    <div className="flex items-baseline space-x-2 mt-1">
+                        <p className="text-3xl font-semibold text-white">${details.currentPrice.toFixed(2)}</p>
+                        <p className={`text-xl font-semibold ${colorClass}`}>
+                            {isPositive ? '+' : ''}{details.change.toFixed(2)} ({isPositive ? '+' : ''}{details.changePercent.toFixed(2)}%)
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <button onClick={onBack} className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                &larr; Back to Search
+            </button>
+        </div>
+
+        <div className="mt-4">
+            <StockChart data={details.historicalData} changePercent={details.changePercent} />
+        </div>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="md:col-span-1 bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
+          <h3 className="text-lg font-semibold text-white mb-4">Key Statistics</h3>
+          <div className="space-y-2">
+            <Stat label="Day's Range" value={details.dayRange} />
+            <Stat label="52-Week Range" value={details.yearRange} />
+            <Stat label="Market Cap" value={details.marketCap} />
+            <Stat label="P/E Ratio" value={details.peRatio ? details.peRatio.toFixed(2) : 'N/A'} />
+            <Stat label="Dividend Yield" value={details.dividendYield ? `${details.dividendYield.toFixed(2)}%` : 'N/A'} />
+          </div>
+        </div>
+
+        <div className="md:col-span-2 bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
+          <h3 className="text-lg font-semibold text-white mb-4">AI-Powered Analysis (Gemini)</h3>
+          {analysisLoading ? (
+            <div className="space-y-3 animate-pulse">
+                <div className="h-4 bg-slate-700 rounded w-1/4"></div>
+                <div className="h-4 bg-slate-700 rounded w-full"></div>
+                <div className="h-4 bg-slate-700 rounded w-5/6"></div>
+                <div className="h-4 bg-slate-700 rounded w-1/4 mt-4"></div>
+                <div className="h-4 bg-slate-700 rounded w-full"></div>
+                <div className="h-4 bg-slate-700 rounded w-3/4"></div>
+            </div>
+          ) : (
+            <div className="prose prose-invert prose-sm max-w-none">
+              <ReactMarkdown>{analysis}</ReactMarkdown>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
+        <h3 className="text-lg font-semibold text-white mb-4">Recent News</h3>
+        <ul className="space-y-4">
+          {details.news.length > 0 ? details.news.slice(0, 5).map((item, index) => (
+            <li key={index} className="border-b border-slate-700 pb-4 last:border-b-0 last:pb-0">
+              <a href={item.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                <h4 className="font-semibold text-white">{item.headline}</h4>
+              </a>
+              <p className="text-sm text-slate-400 mt-1 line-clamp-2">{item.summary}</p>
+              <div className="text-xs text-slate-500 mt-2">
+                <span>{item.source}</span>
+              </div>
+            </li>
+          )) : <p className="text-slate-400">No recent news available.</p>}
+        </ul>
+      </div>
+    </div>
+  );
+};
+
+export default StockDetailView;
