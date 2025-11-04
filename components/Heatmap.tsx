@@ -121,12 +121,16 @@ const Heatmap: React.FC = () => {
 
       {/* TradingView-style Treemap */}
       <div 
-        className="p-1 bg-slate-950 overflow-auto" 
+        className="p-0.5 bg-slate-950 overflow-auto" 
         style={{ 
           height: 'calc(100vh - 180px)'
         }}
       >
-        <div className="flex flex-wrap gap-0.5" style={{ minHeight: '100%' }}>
+        <div className="grid gap-0.5" style={{ 
+          gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+          gridAutoRows: 'minmax(150px, auto)',
+          height: '100%'
+        }}>
           {Object.entries(sectors)
             .sort(([, a], [, b]) => {
               const sumA = a.reduce((sum, s) => sum + s.marketCap, 0);
@@ -138,43 +142,44 @@ const Heatmap: React.FC = () => {
               const totalSectorCap = sortedStocks.reduce((sum, s) => sum + s.marketCap, 0);
               const sectorPercentage = (totalSectorCap / totalMarketCap) * 100;
               
-              // Calculate flex-basis for proportional sizing
-              const flexBasis = `${Math.max(sectorPercentage, 10)}%`;
+              // Calculate grid span based on sector size
+              const colSpan = sectorPercentage > 25 ? 2 : 1;
+              const rowSpan = sectorPercentage > 20 ? 2 : 1;
 
               return (
                 <div 
                   key={sectorName} 
-                  className="border border-slate-700/50 relative bg-slate-900/30"
+                  className="border border-slate-700/60 relative bg-slate-900/40"
                   style={{
-                    flexGrow: sectorPercentage,
-                    flexBasis: flexBasis,
-                    minWidth: '200px',
-                    minHeight: '180px',
+                    gridColumn: `span ${colSpan}`,
+                    gridRow: `span ${rowSpan}`,
+                    minHeight: '150px',
                     display: 'flex',
                     flexDirection: 'column'
                   }}
                 >
                   {/* Sector Label - Top Left Corner */}
-                  <div className="absolute top-1.5 left-1.5 text-[9px] font-semibold text-white/90 bg-slate-900/70 px-1.5 py-0.5 rounded z-10 backdrop-blur-sm border border-slate-700/30">
+                  <div className="absolute top-1 left-1 text-[9px] font-semibold text-white/90 bg-slate-900/80 px-1.5 py-0.5 rounded z-10 backdrop-blur-sm border border-slate-700/40">
                     {sectorName} →
                   </div>
                   
-                  {/* Nested Stock Tiles */}
-                  <div className="flex flex-wrap w-full h-full gap-0.5 p-0.5">
+                  {/* Nested Stock Tiles - Tighter Grid */}
+                  <div className="grid gap-0.5 w-full h-full p-0.5" style={{
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
+                    gridAutoRows: 'minmax(60px, 1fr)'
+                  }}>
                     {sortedStocks.map(stock => {
                       const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
-                      const stockFlexBasis = `${Math.max(stockPercentage, 18)}%`;
-                      const isLargeStock = stockPercentage > 30;
+                      const isLargeStock = stockPercentage > 25;
+                      const isMediumStock = stockPercentage > 15;
                       
                       return (
                         <div
                           key={stock.ticker}
-                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 hover:z-50 cursor-pointer p-2.5 flex flex-col justify-between relative group border border-black/20`}
+                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 hover:z-50 cursor-pointer p-2 flex flex-col justify-between relative group border border-black/20`}
                           style={{
-                            flexGrow: stockPercentage,
-                            flexBasis: stockFlexBasis,
-                            minWidth: isLargeStock ? '120px' : '85px',
-                            minHeight: isLargeStock ? '100px' : '70px'
+                            gridColumn: isLargeStock ? 'span 2' : 'span 1',
+                            gridRow: isLargeStock ? 'span 2' : isMediumStock ? 'span 1' : 'span 1'
                           }}
                         >
                           {/* Top Section: Logo and Ticker */}
@@ -191,20 +196,33 @@ const Heatmap: React.FC = () => {
                             </div>
                             
                             {/* Stock Logo */}
-                            <div className="w-8 h-8 bg-white/95 rounded-md flex items-center justify-center shadow-sm flex-shrink-0 relative overflow-hidden">
-                              {stock.logoUrl ? (
+                            <div className="w-7 h-7 bg-white/95 rounded flex items-center justify-center shadow-sm flex-shrink-0 relative overflow-hidden">
+                              {stock.logoUrl && (
                                 <img 
                                   src={stock.logoUrl} 
                                   alt={stock.ticker}
-                                  className="w-full h-full object-contain p-1"
+                                  className="w-full h-full object-contain p-0.5"
                                   onError={(e) => { 
-                                    // Fallback to ticker letter if logo fails
+                                    // Hide image and show letter fallback
+                                    const parent = e.currentTarget.parentElement;
                                     e.currentTarget.style.display = 'none';
+                                    if (parent) {
+                                      const fallback = parent.querySelector('.logo-fallback');
+                                      if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                                    }
+                                  }}
+                                  onLoad={(e) => {
+                                    // Hide letter if logo loads successfully
+                                    const parent = e.currentTarget.parentElement;
+                                    if (parent) {
+                                      const fallback = parent.querySelector('.logo-fallback');
+                                      if (fallback) (fallback as HTMLElement).style.display = 'none';
+                                    }
                                   }}
                                 />
-                              ) : null}
-                              {/* Fallback letter - always rendered underneath */}
-                              <span className="absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs">
+                              )}
+                              {/* Fallback letter - only shown if logo fails or doesn't exist */}
+                              <span className={`logo-fallback absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs ${stock.logoUrl ? 'hidden' : 'flex'}`}>
                                 {stock.ticker.charAt(0)}
                               </span>
                             </div>
