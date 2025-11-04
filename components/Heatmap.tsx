@@ -175,17 +175,45 @@ const Heatmap: React.FC = () => {
                 >
                   {sortedStocks.map(stock => {
                     const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
-                    const stockWidth = Math.sqrt(stockPercentage) * 30;
+                    
+                    // Better sizing algorithm - larger minimum sizes
+                    let flexBasis = '0';
+                    let minWidth = '70px';
+                    let minHeight = '60px';
+                    
+                    if (stockPercentage > 35) {
+                      flexBasis = '100%'; // Full width for dominant stocks
+                      minWidth = '100%';
+                      minHeight = '85px';
+                    } else if (stockPercentage > 25) {
+                      flexBasis = '48%'; // Half width
+                      minWidth = '48%';
+                      minHeight = '80px';
+                    } else if (stockPercentage > 15) {
+                      flexBasis = '31%'; // Third width
+                      minWidth = '31%';
+                      minHeight = '70px';
+                    } else if (stockPercentage > 8) {
+                      flexBasis = '23%'; // Quarter width
+                      minWidth = '23%';
+                      minHeight = '65px';
+                    } else {
+                      flexBasis = '18%'; // Fifth width
+                      minWidth = '18%';
+                      minHeight = '60px';
+                    }
+                    
                     const isLargeStock = stockPercentage > 20;
                     
                     return (
                       <div
                         key={stock.ticker}
-                        className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-1.5 flex flex-col justify-between relative group`}
+                        className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-2 flex flex-col justify-between relative group`}
                         style={{
-                          flex: `1 1 ${stockWidth}%`,
-                          minWidth: `${Math.max(stockWidth, 18)}%`,
-                          minHeight: '50px',
+                          flex: `1 1 ${flexBasis}`,
+                          minWidth: minWidth,
+                          minHeight: minHeight,
+                          maxWidth: flexBasis === '100%' ? '100%' : undefined,
                           border: '1px solid rgba(0,0,0,0.3)'
                         }}
                       >
