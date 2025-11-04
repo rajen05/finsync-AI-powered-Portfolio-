@@ -224,14 +224,68 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
     const cacheKey = 'heatmap-data';
     const cachedData = getFromCache<HeatmapStock[]>(cacheKey, CACHE_DURATION_MARKET);
     if (cachedData) {
-        console.log('📦 Using cached heatmap data');
+        console.log('⚡ FAST: Using cached heatmap data (instant load)');
         return cachedData;
     }
     
-    if (!hasApiKey || !ai) {
-        console.log('🎭 Using mock heatmap data (no API key)');
-        // Return expanded mock heatmap data
-        return [
+    // Try to fetch from fast APIs first (works in production)
+    try {
+        console.log('🚀 Fetching real-time data from fast APIs...');
+        
+        // Use Finnhub to get top stocks data
+        const response = await fetch('https://finnhub.io/api/v1/stock/symbol?exchange=US&token=ct4a0j9r01qnhqrjrr1gct4a0j9r01qnhqrjrr20');
+        
+        if (response.ok) {
+            const symbols = await response.json();
+            // Get top 50 stocks by market cap (simplified)
+            const topTickers = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'V', 'UNH', 
+                               'XOM', 'JNJ', 'WMT', 'JPM', 'MA', 'PG', 'CVX', 'HD', 'MRK', 'ABBV',
+                               'KO', 'PEP', 'COST', 'AVGO', 'LLY', 'MCD', 'TMO', 'CSCO', 'ACN', 'ADBE',
+                               'NKE', 'DIS', 'NFLX', 'CMCSA', 'VZ', 'INTC', 'AMD', 'CRM', 'ORCL', 'TXN',
+                               'BA', 'CAT', 'UPS', 'HON', 'NEE', 'LIN', 'DHR', 'PM', 'ABT', 'BMY'];
+            
+            // Fetch quotes for each ticker in parallel
+            const quotePromises = topTickers.map(async (ticker) => {
+                try {
+                    const quoteRes = await fetch(`https://finnhub.io/api/v1/quote?symbol=${ticker}&token=ct4a0j9r01qnhqrjrr1gct4a0j9r01qnhqrjrr20`);
+                    const quote = await quoteRes.json();
+                    
+                    // Get company profile for sector info
+                    const profileRes = await fetch(`https://finnhub.io/api/v1/stock/profile2?symbol=${ticker}&token=ct4a0j9r01qnhqrjrr1gct4a0j9r01qnhqrjrr20`);
+                    const profile = await profileRes.json();
+                    
+                    if (quote.c && quote.c > 0) {
+                        return {
+                            ticker: ticker,
+                            companyName: profile.name || ticker,
+                            changePercent: quote.dp || 0,
+                            marketCap: profile.marketCapitalization ? profile.marketCapitalization * 1000000 : 100000000000,
+                            sector: profile.finnhubIndustry || 'Technology',
+                            logoUrl: profile.logo || null
+                        };
+                    }
+                } catch (err) {
+                    console.warn(`Failed to fetch ${ticker}`);
+                }
+                return null;
+            });
+            
+            const results = await Promise.all(quotePromises);
+            const validStocks = results.filter(s => s !== null) as HeatmapStock[];
+            
+            if (validStocks.length > 0) {
+                console.log('✅ Real-time data fetched from Finnhub:', validStocks.length, 'stocks');
+                setInCache(cacheKey, validStocks);
+                return validStocks;
+            }
+        }
+    } catch (error) {
+        console.warn('⚠️ Fast APIs failed (likely CORS in local dev), using mock data:', error);
+    }
+    
+    // Fallback to mock data if APIs fail
+    console.log('📦 Using mock data (API fallback)');
+    const mockData = [
             { ticker: 'AAPL', companyName: 'Apple Inc', changePercent: 2.5, marketCap: 2800000000000, sector: 'Technology', logoUrl: null },
             { ticker: 'MSFT', companyName: 'Microsoft Corp', changePercent: 1.8, marketCap: 2600000000000, sector: 'Technology', logoUrl: null },
             { ticker: 'GOOGL', companyName: 'Alphabet Inc', changePercent: -0.5, marketCap: 1700000000000, sector: 'Technology', logoUrl: null },
@@ -273,36 +327,8 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
             { ticker: 'BA', companyName: 'Boeing Co', changePercent: -2.1, marketCap: 120000000000, sector: 'Industrials', logoUrl: null },
             { ticker: 'CAT', companyName: 'Caterpillar Inc', changePercent: 1.5, marketCap: 150000000000, sector: 'Industrials', logoUrl: null },
         ];
-    }
     
-    console.log('🌐 Fetching live heatmap data from Gemini API...');
-    
-    try {
-        // Increased to 50 stocks for more variety
-        const prompt = `Generate data for a stock market heatmap. Provide a list of 50 major companies from diverse sectors including: Technology, Healthcare, Financials, Consumer Discretionary, Consumer Staples, Energy, Industrials, Communication Services, Materials, Utilities, and Real Estate. For each company, provide: ticker symbol, company name, today's percentage change, market cap as a number, primary sector, and a public logo URL (use official company logo URLs). Focus on well-known S&P 500 companies with variety across all sectors.`;
-
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash-exp',
-            contents: prompt,
-            config: {
-                responseMimeType: 'application/json',
-                responseSchema: heatmapSchema,
-            }
-        });
-
-        const data = parseJsonResponse<HeatmapStock[]>(response.text, 'heatmap data');
-        if (!data) {
-            console.error('❌ Failed to parse heatmap data, returning empty array');
-            return [];
-        }
-
-        console.log('✅ Heatmap data fetched successfully:', data.length, 'stocks');
-        setInCache(cacheKey, data);
-        return data;
-    } catch (error) {
-        console.error('❌ Error fetching heatmap data:', error);
-        throw error;
-    }
+    return mockData;
 };
 
 export const fetchMarketData = async (tickers: string[]): Promise<{ [key: string]: number }> => {

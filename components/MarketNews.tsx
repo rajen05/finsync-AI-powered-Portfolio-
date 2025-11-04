@@ -20,12 +20,12 @@ const MarketNews: React.FC = () => {
 
   const fetchMarketNews = async () => {
     try {
-      // Mock news data (in production, this would fetch from a news API)
+      // Mock news data with real external links
       const mockNews: NewsArticle[] = [
         {
           title: "Tech Stocks Rally as AI Investments Surge",
           source: "Financial Times",
-          url: "#",
+          url: "https://www.ft.com/technology",
           publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
           summary: "Major technology companies see significant gains as artificial intelligence investments continue to drive market sentiment.",
           image: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=200&fit=crop"
@@ -33,7 +33,7 @@ const MarketNews: React.FC = () => {
         {
           title: "Federal Reserve Holds Interest Rates Steady",
           source: "Bloomberg",
-          url: "#",
+          url: "https://www.bloomberg.com/markets",
           publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
           summary: "The Fed maintains current interest rate levels, citing stable inflation and strong employment data.",
           image: "https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=400&h=200&fit=crop"
@@ -41,7 +41,7 @@ const MarketNews: React.FC = () => {
         {
           title: "Energy Sector Sees Mixed Results Amid Oil Price Volatility",
           source: "Reuters",
-          url: "#",
+          url: "https://www.reuters.com/business/energy",
           publishedAt: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
           summary: "Oil prices fluctuate as global demand concerns offset supply constraints, impacting energy stocks.",
           image: "https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=400&h=200&fit=crop"
@@ -49,7 +49,7 @@ const MarketNews: React.FC = () => {
         {
           title: "Cryptocurrency Market Rebounds After Recent Selloff",
           source: "CoinDesk",
-          url: "#",
+          url: "https://www.coindesk.com/markets",
           publishedAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
           summary: "Bitcoin and Ethereum recover losses as institutional investors return to the market.",
           image: "https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=200&fit=crop"
@@ -57,7 +57,7 @@ const MarketNews: React.FC = () => {
         {
           title: "Healthcare Stocks Gain on Breakthrough Drug Approvals",
           source: "CNBC",
-          url: "#",
+          url: "https://www.cnbc.com/health-and-science",
           publishedAt: new Date(Date.now() - 10 * 60 * 60 * 1000).toISOString(),
           summary: "Major pharmaceutical companies announce FDA approvals for innovative treatments, boosting sector performance.",
           image: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=200&fit=crop"
@@ -65,18 +65,16 @@ const MarketNews: React.FC = () => {
         {
           title: "Retail Sales Beat Expectations in Latest Report",
           source: "Wall Street Journal",
-          url: "#",
+          url: "https://www.wsj.com/news/markets",
           publishedAt: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
           summary: "Consumer spending remains robust, signaling continued economic strength despite inflation concerns.",
           image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&h=200&fit=crop"
         }
       ];
 
-      // Simulate API delay
-      setTimeout(() => {
-        setNews(mockNews);
-        setLoading(false);
-      }, 500);
+      // Load immediately (no fake delay)
+      setNews(mockNews);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching news:', error);
       setLoading(false);
