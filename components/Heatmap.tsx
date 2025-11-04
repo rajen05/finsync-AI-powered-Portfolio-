@@ -88,35 +88,49 @@ const Heatmap: React.FC = () => {
   }
 
   return (
-    <div className="bg-slate-900 rounded-lg shadow-lg overflow-hidden">
+    <div className="bg-slate-900 rounded-lg shadow-lg border border-slate-700 overflow-hidden">
       {/* Compact Header */}
-      <div className="bg-slate-800 border-b border-slate-700 px-4 py-2.5 flex items-center justify-between">
+      <div className="bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-white">Market Heatmap</h2>
           <p className="text-xs text-slate-400">Size: Market Cap • Color: % Change</p>
         </div>
         
-        <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full">
-          <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span className="text-xs text-slate-300 font-medium">{dataSource}</span>
-          <span className="text-xs text-slate-500">• {heatmapData?.length || 0} stocks</span>
+        <div className="flex items-center gap-4">
+          {/* Refresh Button */}
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 rounded-lg transition-colors text-sm"
+            title="Refresh data"
+          >
+            <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span className="text-xs font-medium">Refresh</span>
+          </button>
+          
+          {/* Data Source Indicator */}
+          <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full">
+            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            <span className="text-xs text-slate-300 font-medium">{dataSource}</span>
+            <span className="text-xs text-slate-500">• {heatmapData?.length || 0} stocks</span>
+          </div>
         </div>
       </div>
 
       {/* TradingView-style Treemap */}
       <div 
-        className="bg-slate-950" 
+        className="bg-slate-950 p-1" 
         style={{ 
-          height: 'calc(100vh - 155px)',
-          overflow: 'hidden',
-          padding: '4px'
+          height: 'calc(100vh - 180px)',
+          overflow: 'hidden'
         }}
       >
-        <div className="grid gap-1" style={{
+        <div className="grid gap-1 h-full" style={{
           gridTemplateColumns: 'repeat(5, 1fr)',
-          gridAutoRows: 'minmax(100px, auto)',
-          gridAutoFlow: 'dense',
-          overflow: 'visible'
+          gridAutoRows: '1fr',
+          gridAutoFlow: 'dense'
         }}>
           {Object.entries(sectors)
             .sort(([, a], [, b]) => {
@@ -213,13 +227,13 @@ const Heatmap: React.FC = () => {
 
                         {/* Tooltip */}
                         <div 
-                          className="fixed hidden group-hover:block bg-slate-900/98 backdrop-blur-sm text-white text-xs p-3 rounded-lg shadow-2xl border border-slate-600 min-w-[200px]"
+                          className="absolute hidden group-hover:block bg-slate-900/98 backdrop-blur-sm text-white text-xs p-3 rounded-lg shadow-2xl border border-slate-600 min-w-[200px]"
                           style={{ 
                             pointerEvents: 'none',
                             zIndex: 99999,
-                            left: '50%',
-                            top: '50%',
-                            transform: 'translate(-50%, -120%)'
+                            left: '110%',
+                            top: '0',
+                            marginLeft: '8px'
                           }}
                         >
                           <div className="font-bold text-sm mb-2 border-b border-slate-700 pb-1">{stock.companyName}</div>
