@@ -65,10 +65,11 @@ const Heatmap: React.FC = () => {
     return 'text-gray-200';
   };
 
-  // Calculate relative size for treemap
-  const getSizeMultiplier = (marketCap: number, maxCap: number) => {
-    return Math.sqrt(marketCap / maxCap) * 100;
-  };
+  // Calculate total market cap for sizing
+  const totalMarketCap = useMemo(() => {
+    if (!heatmapData) return 0;
+    return heatmapData.reduce((sum, stock) => sum + stock.marketCap, 0);
+  }, [heatmapData]);
 
   if (isLoading && !heatmapData) {
     return (
@@ -85,12 +86,6 @@ const Heatmap: React.FC = () => {
   if (!heatmapData || heatmapData.length === 0) {
     return <div className="text-center p-10 bg-slate-900 rounded-lg">No heatmap data available.</div>;
   }
-
-  // Calculate total market cap for sizing
-  const totalMarketCap = useMemo(() => {
-    if (!heatmapData) return 0;
-    return heatmapData.reduce((sum, stock) => sum + stock.marketCap, 0);
-  }, [heatmapData]);
 
   return (
     <div className="bg-slate-900 rounded-lg shadow-lg border border-slate-700 overflow-hidden">
