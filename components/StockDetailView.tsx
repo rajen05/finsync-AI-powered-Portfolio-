@@ -62,11 +62,51 @@ const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => 
   }
 
   if (error) {
-    return <div className="text-center p-10 text-red-500 bg-slate-800 rounded-lg">{error}</div>;
+    return (
+      <div className="bg-slate-800 p-8 rounded-lg shadow-lg border border-red-900/50">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-2xl font-bold text-white mb-2">Stock Not Found</h3>
+          <p className="text-red-400 mb-4">
+            We couldn't find data for "<span className="font-semibold">{symbol}</span>"
+          </p>
+          <div className="bg-slate-900/50 rounded-lg p-4 mb-6 text-left">
+            <p className="text-sm text-slate-400 mb-2">💡 <strong className="text-white">Try searching for:</strong></p>
+            <ul className="text-sm text-slate-400 space-y-1 ml-6 list-disc">
+              <li>Company name: <span className="text-blue-400">Apple, Microsoft, Tesla</span></li>
+              <li>Stock symbol: <span className="text-blue-400">AAPL, MSFT, TSLA</span></li>
+              <li>Crypto symbol: <span className="text-orange-400">BTC-USD, ETH-USD</span></li>
+            </ul>
+          </div>
+          <button
+            onClick={onBack}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            ← Back to Search
+          </button>
+        </div>
+      </div>
+    );
   }
 
   if (!details) {
-    return <div className="text-center p-10 bg-slate-800 rounded-lg">No data available for {symbol}.</div>;
+    return (
+      <div className="bg-slate-800 p-8 rounded-lg shadow-lg border border-slate-700">
+        <div className="text-center">
+          <div className="text-6xl mb-4">📊</div>
+          <h3 className="text-xl font-semibold text-white mb-2">No Data Available</h3>
+          <p className="text-slate-400 mb-4">
+            Unable to load data for {symbol}
+          </p>
+          <button
+            onClick={onBack}
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+          >
+            ← Back to Search
+          </button>
+        </div>
+      </div>
+    );
   }
 
   const isPositive = details.changePercent >= 0;

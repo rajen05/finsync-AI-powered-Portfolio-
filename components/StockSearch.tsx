@@ -162,24 +162,33 @@ const StockSearch: React.FC<StockSearchProps> = ({ onSelect, value }) => {
   }
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!showSuggestions || suggestions.length === 0) return
-
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault()
-        setSelectedIndex(prev => 
-          prev < suggestions.length - 1 ? prev + 1 : prev
-        )
+        if (suggestions.length > 0) {
+          setSelectedIndex(prev => 
+            prev < suggestions.length - 1 ? prev + 1 : prev
+          )
+        }
         break
       case 'ArrowUp':
         e.preventDefault()
-        setSelectedIndex(prev => prev > 0 ? prev - 1 : -1)
+        if (suggestions.length > 0) {
+          setSelectedIndex(prev => prev > 0 ? prev - 1 : -1)
+        }
         break
       case 'Enter':
         e.preventDefault()
-        if (selectedIndex >= 0) {
-          handleSelect(suggestions[selectedIndex].symbol)
+        if (suggestions.length > 0) {
+          // If user has selected a suggestion, use it
+          if (selectedIndex >= 0) {
+            handleSelect(suggestions[selectedIndex].symbol)
+          } else {
+            // Auto-select first suggestion if available
+            handleSelect(suggestions[0].symbol)
+          }
         } else if (query.trim()) {
+          // If no suggestions, try the query as-is (uppercase for symbol)
           handleSelect(query.toUpperCase())
         }
         break
