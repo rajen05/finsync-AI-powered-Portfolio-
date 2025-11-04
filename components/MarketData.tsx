@@ -4,13 +4,16 @@ import MarketNews from './MarketNews';
 import StockSearch from './StockSearch';
 import { prefetchStockDetails } from '../services/geminiService';
 import { useMarketData } from '../context/MarketDataProvider';
+import { WishlistItem } from '../types';
 
 interface MarketDataProps {
   symbol: string | null;
   setSymbol: (symbol: string | null) => void;
+  wishlist?: WishlistItem[];
+  onAddToWishlist?: (item: Omit<WishlistItem, 'id' | 'addedAt'>) => void;
 }
 
-const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol }) => {
+const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol, wishlist, onAddToWishlist }) => {
   const [inputValue, setInputValue] = useState('');
   
   const { topMovers, isLoading: isLoadingMovers, error: errorMovers } = useMarketData();
@@ -47,7 +50,12 @@ const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol }) => {
       </div>
 
       {symbol ? (
-        <StockDetailView symbol={symbol} onBack={() => setSymbol(null)} />
+        <StockDetailView 
+          symbol={symbol} 
+          onBack={() => setSymbol(null)}
+          wishlist={wishlist}
+          onAddToWishlist={onAddToWishlist}
+        />
       ) : (
         <>
           <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 transition-colors">

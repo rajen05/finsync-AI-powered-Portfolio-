@@ -104,22 +104,16 @@ export const Dashboard: React.FC<DashboardProps> = ({
           </div>
         );
       case 'transactions':
-        return (
-          <div className="space-y-4">
-            <div className="flex justify-end">
-              <button
-                onClick={() => setIsImportExportOpen(true)}
-                className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
-              >
-                <span>📊</span>
-                <span>Import / Export CSV</span>
-              </button>
-            </div>
-            <TransactionsTable transactions={transactions} />
-          </div>
-        );
+        return <TransactionsTable transactions={transactions} />;
       case 'market':
-        return <MarketData symbol={marketSymbol} setSymbol={setMarketSymbol} />;
+        return (
+          <MarketData 
+            symbol={marketSymbol} 
+            setSymbol={setMarketSymbol}
+            wishlist={wishlist}
+            onAddToWishlist={onAddWishlistItem}
+          />
+        );
       case 'heatmap':
         return <Heatmap />;
       case 'wishlist':
@@ -156,18 +150,31 @@ export const Dashboard: React.FC<DashboardProps> = ({
       />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold capitalize text-gray-900 dark:text-white">{currentPage}</h1>
-          {currentPage !== 'market' && currentPage !== 'heatmap' && currentPage !== 'wishlist' && (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-md inline-flex items-center transition-colors"
-            >
-              <PlusIcon />
-              <span className="ml-2">Add Transaction</span>
-            </button>
-          )}
-        </div>
+        {currentPage !== 'market' && currentPage !== 'heatmap' && (
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-semibold capitalize text-gray-900 dark:text-white">{currentPage}</h1>
+            <div className="flex gap-3">
+              {currentPage === 'transactions' && (
+                <button
+                  onClick={() => setIsImportExportOpen(true)}
+                  className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+                >
+                  <span>📊</span>
+                  <span>Import / Export CSV</span>
+                </button>
+              )}
+              {currentPage !== 'wishlist' && (
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-md inline-flex items-center transition-colors"
+                >
+                  <PlusIcon />
+                  <span className="ml-2">Add Transaction</span>
+                </button>
+              )}
+            </div>
+          </div>
+        )}
         
         {renderPage()}
       </main>

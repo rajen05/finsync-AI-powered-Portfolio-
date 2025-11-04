@@ -20,6 +20,12 @@ const Profile: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
+  const [showPasswordChange, setShowPasswordChange] = useState(false)
+  const [passwordData, setPasswordData] = useState({
+    newPassword: '',
+    confirmPassword: '',
+  })
+  const [passwordError, setPasswordError] = useState('')
 
   useEffect(() => {
     if (user) {
@@ -77,6 +83,39 @@ const Profile: React.FC = () => {
     await signOut()
   }
 
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setPasswordError('')
+    setMessage(null)
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordError('Password must be at least 6 characters')
+      return
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordError('Passwords do not match')
+      return
+    }
+
+    setSaving(true)
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: passwordData.newPassword
+      })
+
+      if (error) throw error
+
+      setMessage({ type: 'success', text: 'Password updated successfully!' })
+      setShowPasswordChange(false)
+      setPasswordData({ newPassword: '', confirmPassword: '' })
+    } catch (error: any) {
+      setPasswordError(error.message)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -86,14 +125,14 @@ const Profile: React.FC = () => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Profile Settings</h1>
-        <p className="text-gray-600 dark:text-slate-400">Manage your account information</p>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">Profile Settings</h1>
+        <p className="text-sm text-gray-600 dark:text-slate-400">Manage your account information</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* Profile Card */}
         <div className="lg:col-span-1">
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 p-6">
@@ -220,14 +259,99 @@ const Profile: React.FC = () => {
             </form>
           </div>
 
-          {/* Account Info */}
-          <div className="mt-6 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-            <h4 className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-2">
-              🔒 Your data is secure
-            </h4>
-            <p className="text-sm text-blue-700 dark:text-blue-400">
-              All your portfolio data is encrypted and protected with Row Level Security. Only you can access your transactions and holdings.
-            </p>
+        </div>
+
+        {/* Password Change Card */}
+        <div className="lg:col-span-1">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+              Security
+            </h3>
+
+            {!showPasswordChange ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600 dark:text-slate-400">
+                  Keep your account secure by using a strong password
+                </p>
+                <button
+                  onClick={() => setShowPasswordChange(true)}
+                  className="w-full py-2 px-4 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-colors"
+                >
+                  Change Password
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                {passwordError && (
+                  <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <p className="text-sm text-red-600 dark:text-red-400">{passwordError}</p>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                    New Password
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    required
+                    minLength={6}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
+                    Confirm Password
+                  </label>
+                  <input
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    required
+                    minLength={6}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium rounded-lg transition-colors"
+                  >
+                    {saving ? 'Updating...' : 'Update'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPasswordChange(false)
+                      setPasswordData({ newPassword: '', confirmPassword: '' })
+                      setPasswordError('')
+                    }}
+                    className="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Security Info */}
+            <div className="mt-6 pt-6 border-t border-gray-200 dark:border-slate-700">
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+                🔒 Account Security
+              </h4>
+              <ul className="text-xs text-gray-600 dark:text-slate-400 space-y-1">
+                <li>• Password must be 6+ characters</li>
+                <li>• Use a unique password</li>
+                <li>• Enable 2FA (coming soon)</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>

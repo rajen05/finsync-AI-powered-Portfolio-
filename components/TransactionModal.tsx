@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Transaction, AssetType, TransactionType } from '../types';
 import { CloseIcon } from './icons/CloseIcon';
+import StockSearch from './StockSearch';
 
 interface TransactionModalProps {
   onClose: () => void;
@@ -39,8 +40,11 @@ const TransactionModal: React.FC<TransactionModalProps> = ({ onClose, onAddTrans
         <form onSubmit={handleSubmit} className="space-y-4">
             
           <div>
-            <label htmlFor="ticker" className="block text-sm font-medium text-slate-300">Ticker</label>
-            <input type="text" id="ticker" value={ticker} onChange={(e) => setTicker(e.target.value)} required className="mt-1 block w-full bg-slate-700 border-slate-600 rounded-md shadow-sm py-2 px-3 text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., AAPL, BTC-USD" />
+            <label htmlFor="ticker" className="block text-sm font-medium text-slate-300 mb-2">Ticker</label>
+            <StockSearch
+              value={ticker}
+              onSelect={(selectedSymbol) => setTicker(selectedSymbol)}
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

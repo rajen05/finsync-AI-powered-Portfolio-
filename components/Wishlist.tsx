@@ -69,13 +69,10 @@ const Wishlist: React.FC<WishlistProps> = ({ wishlist, onAddItem, onRemoveItem, 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Watchlist</h2>
-          <p className="text-sm text-gray-500 dark:text-slate-400 mt-1">
-            Track stocks and crypto you're interested in
-          </p>
-        </div>
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-sm text-gray-500 dark:text-slate-400">
+          Track stocks and crypto you're interested in
+        </p>
         <button
           onClick={() => setIsModalOpen(true)}
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg inline-flex items-center transition-colors shadow-md"

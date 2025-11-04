@@ -20,9 +20,11 @@ const AllocationChart: React.FC<AllocationChartProps> = ({ data, isLoading }) =>
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700 h-96 flex items-center justify-center">
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Asset Allocation</h2>
-        <p className="text-slate-400 dark:text-slate-300">No data to display. Add transactions to see your allocation.</p>
+      <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700 h-96">
+        <h2 className="text-lg font-semibold text-white mb-4">Asset Allocation</h2>
+        <div className="flex items-center justify-center h-full">
+          <p className="text-slate-400 text-center">No data to display. Add transactions to see your allocation.</p>
+        </div>
       </div>
     );
   }

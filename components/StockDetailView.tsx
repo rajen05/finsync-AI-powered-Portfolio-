@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { fetchStockDetails, getStockAnalysis } from '../services/geminiService';
-import { StockDetails } from '../types';
+import { StockDetails, AssetType, WishlistItem } from '../types';
 import StockChart from './StockChart';
 import ReactMarkdown from 'react-markdown';
 
 interface StockDetailViewProps {
   symbol: string;
   onBack: () => void;
+  wishlist?: WishlistItem[];
+  onAddToWishlist?: (item: Omit<WishlistItem, 'id' | 'addedAt'>) => void;
 }
 
 const Stat: React.FC<{ label: string; value: string | number | null | undefined }> = ({ label, value }) => (
@@ -16,8 +18,9 @@ const Stat: React.FC<{ label: string; value: string | number | null | undefined 
   </div>
 );
 
-const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => {
+const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack, wishlist = [], onAddToWishlist }) => {
   const [details, setDetails] = useState<StockDetails | null>(null);
+  const [showWishlistToast, setShowWishlistToast] = useState(false);
   const [analysis, setAnalysis] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -114,6 +117,18 @@ const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => 
 
   return (
     <div className="space-y-6">
+      {/* Toast Notification */}
+      {showWishlistToast && (
+        <div className="fixed top-20 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
+          <div className="flex items-center gap-2">
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+            </svg>
+            <span className="font-medium">Added to watchlist!</span>
+          </div>
+        </div>
+      )}
+      
       <div className="bg-slate-800 p-6 rounded-lg shadow-lg border border-slate-700">
         <div className="flex justify-between items-start mb-4">
             <div className="flex items-center gap-4">
@@ -128,9 +143,39 @@ const StockDetailView: React.FC<StockDetailViewProps> = ({ symbol, onBack }) => 
                     </div>
                 </div>
             </div>
-            <button onClick={onBack} className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+            <div className="flex items-center gap-3">
+              {onAddToWishlist && (
+                <button
+                  onClick={() => {
+                    const isInWishlist = wishlist.some(item => item.ticker === details.ticker);
+                    if (!isInWishlist) {
+                      onAddToWishlist({
+                        ticker: details.ticker,
+                        assetType: details.ticker.includes('-USD') ? AssetType.Crypto : AssetType.Stock,
+                        targetPrice: details.currentPrice,
+                        notes: `Added from market data on ${new Date().toLocaleDateString()}`,
+                      });
+                      setShowWishlistToast(true);
+                      setTimeout(() => setShowWishlistToast(false), 3000);
+                    }
+                  }}
+                  className={`p-2 rounded-lg transition-all ${
+                    wishlist.some(item => item.ticker === details.ticker)
+                      ? 'bg-red-600 text-white cursor-not-allowed'
+                      : 'bg-slate-700 hover:bg-red-600 text-slate-300 hover:text-white'
+                  }`}
+                  title={wishlist.some(item => item.ticker === details.ticker) ? 'Already in watchlist' : 'Add to watchlist'}
+                  disabled={wishlist.some(item => item.ticker === details.ticker)}
+                >
+                  <svg className="w-6 h-6" fill={wishlist.some(item => item.ticker === details.ticker) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
+              )}
+              <button onClick={onBack} className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
                 &larr; Back to Search
-            </button>
+              </button>
+            </div>
         </div>
 
         <div className="mt-4">
