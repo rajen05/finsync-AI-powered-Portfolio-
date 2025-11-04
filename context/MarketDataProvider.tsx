@@ -63,13 +63,29 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
         console.error('❌ Heatmap fetch failed:', results[0].reason);
       }
       
-      if (results[1].status === 'fulfilled') setTopMovers(results[1].value);
-      if (results[2].status === 'fulfilled') setPortfolioPrices(results[2].value);
+      if (results[1].status === 'fulfilled') {
+        console.log('✅ Top movers received:', results[1].value?.length, 'items');
+        setTopMovers(results[1].value);
+      } else {
+        console.error('❌ Top movers fetch failed:', results[1].reason);
+      }
+      
+      if (results[2].status === 'fulfilled') {
+        console.log('✅ Portfolio prices received');
+        setPortfolioPrices(results[2].value);
+      } else {
+        console.error('❌ Portfolio prices fetch failed:', results[2].reason);
+      }
 
-      const failed = results.filter(r => r.status === 'rejected');
-      if (failed.length > 0) {
-        console.error("Some market data failed to update:", failed);
-        setError("Could not update all market data.");
+      // Only show error if ALL critical data (heatmap + top movers) failed
+      const criticalFailed = results[0].status === 'rejected' && results[1].status === 'rejected';
+      if (criticalFailed) {
+        console.error("❌ ALL market data sources failed");
+        const errorMsg = results[0].status === 'rejected' ? results[0].reason?.message : 'Unknown error';
+        setError(`Data fetch failed: ${errorMsg}. Please check your internet connection or add GEMINI_API_KEY to environment variables.`);
+      } else if (results[0].status === 'rejected' || results[1].status === 'rejected') {
+        console.warn("⚠️ Some data sources failed, but app is still functional");
+        // Don't set error - app can still work with partial data
       }
 
     } catch (err) {
