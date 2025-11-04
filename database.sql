@@ -1,6 +1,8 @@
 -- =============================================
 -- FinSync Investment Portfolio Database Schema
 -- Database: Supabase (PostgreSQL)
+-- Version: 1.0 - FINAL ✅
+-- Last Updated: November 4, 2024
 -- =============================================
 
 -- =============================================
