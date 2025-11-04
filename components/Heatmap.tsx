@@ -121,102 +121,74 @@ const Heatmap: React.FC = () => {
 
       {/* TradingView-style Treemap */}
       <div 
-        className="bg-slate-950" 
+        className="bg-slate-950 p-1 overflow-auto" 
         style={{ 
-          height: 'calc(100vh - 180px)',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '2px',
-          padding: '2px'
+          height: 'calc(100vh - 180px)'
         }}
       >
-        {Object.entries(sectors)
-          .sort(([, a], [, b]) => {
-            const sumA = a.reduce((sum, s) => sum + s.marketCap, 0);
-            const sumB = b.reduce((sum, s) => sum + s.marketCap, 0);
-            return sumB - sumA;
-          })
-          .map(([sectorName, stocks]) => {
-            const sortedStocks = stocks.sort((a, b) => b.marketCap - a.marketCap);
-            const totalSectorCap = sortedStocks.reduce((sum, s) => sum + s.marketCap, 0);
-            const sectorPercentage = (totalSectorCap / totalMarketCap) * 100;
-            
-            // Calculate width percentage for clean layout
-            const widthPercent = Math.sqrt(sectorPercentage) * 30;
-            const heightPercent = (sectorPercentage / widthPercent) * 100;
+        <div className="grid gap-1" style={{
+          gridTemplateColumns: 'repeat(5, 1fr)',
+          gridAutoRows: 'minmax(70px, auto)',
+          height: '100%'
+        }}>
+          {Object.entries(sectors)
+            .sort(([, a], [, b]) => {
+              const sumA = a.reduce((sum, s) => sum + s.marketCap, 0);
+              const sumB = b.reduce((sum, s) => sum + s.marketCap, 0);
+              return sumB - sumA;
+            })
+            .map(([sectorName, stocks]) => {
+              const sortedStocks = stocks.sort((a, b) => b.marketCap - a.marketCap);
+              const totalSectorCap = sortedStocks.reduce((sum, s) => sum + s.marketCap, 0);
+              const sectorPercentage = (totalSectorCap / totalMarketCap) * 100;
+              
+              // Calculate grid spans based on size
+              let colSpan = 1;
+              let rowSpan = 1;
+              
+              if (sectorPercentage > 25) {
+                colSpan = 2;
+                rowSpan = 2;
+              } else if (sectorPercentage > 15) {
+                colSpan = 2;
+                rowSpan = 1;
+              } else if (sectorPercentage > 8) {
+                colSpan = 1;
+                rowSpan = 2;
+              }
 
-            return (
-              <div 
-                key={sectorName} 
-                className="border border-slate-700 relative overflow-hidden"
-                style={{
-                  flex: `1 1 ${widthPercent}%`,
-                  minWidth: `${Math.max(widthPercent, 15)}%`,
-                  minHeight: '140px',
-                  maxHeight: '50%',
-                  position: 'relative'
-                }}
-              >
-                {/* Sector Label */}
-                <div className="absolute top-1 left-1 text-[9px] font-semibold text-white/90 bg-black/60 px-1.5 py-0.5 rounded z-20 backdrop-blur-sm">
-                  {sectorName} →
-                </div>
-                
-                {/* Stock Tiles - Clean Grid */}
+              return (
                 <div 
+                  key={sectorName} 
+                  className="border border-slate-700 relative overflow-hidden bg-slate-900/30"
                   style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '1px',
-                    width: '100%',
-                    height: '100%',
-                    padding: '1px'
+                    gridColumn: `span ${colSpan}`,
+                    gridRow: `span ${rowSpan}`
                   }}
                 >
-                  {sortedStocks.map(stock => {
-                    const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
-                    
-                    // Better sizing algorithm - larger minimum sizes
-                    let flexBasis = '0';
-                    let minWidth = '70px';
-                    let minHeight = '60px';
-                    
-                    if (stockPercentage > 35) {
-                      flexBasis = '100%'; // Full width for dominant stocks
-                      minWidth = '100%';
-                      minHeight = '85px';
-                    } else if (stockPercentage > 25) {
-                      flexBasis = '48%'; // Half width
-                      minWidth = '48%';
-                      minHeight = '80px';
-                    } else if (stockPercentage > 15) {
-                      flexBasis = '31%'; // Third width
-                      minWidth = '31%';
-                      minHeight = '70px';
-                    } else if (stockPercentage > 8) {
-                      flexBasis = '23%'; // Quarter width
-                      minWidth = '23%';
-                      minHeight = '65px';
-                    } else {
-                      flexBasis = '18%'; // Fifth width
-                      minWidth = '18%';
-                      minHeight = '60px';
-                    }
-                    
-                    const isLargeStock = stockPercentage > 20;
-                    
-                    return (
-                      <div
-                        key={stock.ticker}
-                        className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-2 flex flex-col justify-between relative group`}
-                        style={{
-                          flex: `1 1 ${flexBasis}`,
-                          minWidth: minWidth,
-                          minHeight: minHeight,
-                          maxWidth: flexBasis === '100%' ? '100%' : undefined,
-                          border: '1px solid rgba(0,0,0,0.3)'
-                        }}
-                      >
+                  {/* Sector Label */}
+                  <div className="absolute top-1 left-1 text-[9px] font-semibold text-white bg-black/70 px-1.5 py-0.5 rounded z-20">
+                    {sectorName} →
+                  </div>
+                  
+                  {/* Stock Tiles Grid */}
+                  <div className="grid gap-0.5 w-full h-full p-0.5" style={{
+                    gridTemplateColumns: colSpan > 1 ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
+                    gridAutoRows: 'minmax(55px, 1fr)'
+                  }}>
+                    {sortedStocks.map(stock => {
+                      const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
+                      const isLarge = stockPercentage > 30;
+                      
+                      return (
+                        <div
+                          key={stock.ticker}
+                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-1.5 flex flex-col justify-between relative group border border-black/20`}
+                          style={{
+                            gridColumn: isLarge ? 'span 2' : 'span 1',
+                            gridRow: isLarge ? 'span 2' : 'span 1'
+                          }}
+                        >
                         {/* Ticker and Logo */}
                         <div className="flex items-start justify-between gap-1">
                           <div className="font-bold text-xs">{stock.ticker}</div>
@@ -270,6 +242,7 @@ const Heatmap: React.FC = () => {
               </div>
             );
           })}
+        </div>
       </div>
     </div>
   );
