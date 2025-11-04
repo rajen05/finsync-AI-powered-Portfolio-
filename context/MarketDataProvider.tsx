@@ -42,6 +42,7 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
     setError(null);
 
     const tickers = portfolioTickersString ? portfolioTickersString.split(',') : [];
+    console.log('📊 Portfolio tickers to fetch:', tickers);
 
     try {
       // Use Promise.allSettled to ensure one failed request doesn't stop others
@@ -72,8 +73,10 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
       }
       
       if (results[2].status === 'fulfilled') {
-        console.log('✅ Portfolio prices received');
-        setPortfolioPrices(results[2].value);
+        const prices = results[2].value;
+        console.log('✅ Portfolio prices received:', prices);
+        console.log('📊 Price count:', Object.keys(prices).length);
+        setPortfolioPrices(prices);
       } else {
         console.error('❌ Portfolio prices fetch failed:', results[2].reason);
       }
