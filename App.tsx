@@ -2,7 +2,10 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Transaction, AssetType, TransactionType, WishlistItem } from './types';
 import { MarketDataProvider } from './context/MarketDataProvider';
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { Dashboard } from './components/Dashboard';
+import Login from './components/Login';
+import Signup from './components/Signup';
 
 const initialTransactions: Transaction[] = [
   { id: '1', ticker: 'AAPL', assetType: AssetType.Stock, type: TransactionType.Buy, quantity: 10, price: 150, date: '2023-01-15', broker: 'Fidelity' },
@@ -13,7 +16,9 @@ const initialTransactions: Transaction[] = [
 ];
 
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { user, loading: authLoading } = useAuth();
+  const [authView, setAuthView] = useState<'login' | 'signup'>('login');
   const [transactions, setTransactions] = useState<Transaction[]>(() => {
     try {
       const savedTransactions = localStorage.getItem('portfolio-transactions');
@@ -82,20 +87,49 @@ const App: React.FC = () => {
     return Array.from(allTickers);
   }, [transactions, wishlist]);
 
+  // Show loading spinner while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-slate-400">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show auth pages if not logged in and trying to access protected routes
+  // Note: Heatmap and Market Data are public, so we only show auth for other pages
+  // This will be handled in Dashboard component
+
+  return (
+    <div className="bg-white dark:bg-slate-900 text-gray-900 dark:text-white min-h-screen transition-colors">
+      <MarketDataProvider portfolioTickers={portfolioTickers}>
+        <Dashboard 
+          transactions={transactions}
+          onAddTransaction={handleAddTransaction}
+          wishlist={wishlist}
+          onAddWishlistItem={handleAddWishlistItem}
+          onRemoveWishlistItem={handleRemoveWishlistItem}
+          onUpdateWishlistItem={handleUpdateWishlistItem}
+          user={user}
+          onShowAuth={(view) => setAuthView(view)}
+        />
+      </MarketDataProvider>
+      
+      {/* Auth Modals - Show when user tries to access protected routes */}
+      {/* These will be triggered from Dashboard when needed */}
+    </div>
+  );
+}
+
+const App: React.FC = () => {
   return (
     <ThemeProvider>
-      <div className="bg-white dark:bg-slate-900 text-gray-900 dark:text-white min-h-screen transition-colors">
-        <MarketDataProvider portfolioTickers={portfolioTickers}>
-          <Dashboard 
-            transactions={transactions}
-            onAddTransaction={handleAddTransaction}
-            wishlist={wishlist}
-            onAddWishlistItem={handleAddWishlistItem}
-            onRemoveWishlistItem={handleRemoveWishlistItem}
-            onUpdateWishlistItem={handleUpdateWishlistItem}
-          />
-        </MarketDataProvider>
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </ThemeProvider>
   );
 }

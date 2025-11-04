@@ -1,4 +1,5 @@
 import React from 'react';
+import { User } from '@supabase/supabase-js';
 import { DollarIcon } from './icons/DollarIcon';
 import { useMarketData } from '../context/MarketDataProvider';
 import { useTheme } from '../context/ThemeContext';
@@ -10,9 +11,10 @@ const hasApiKey = !!API_KEY;
 interface HeaderProps {
   currentPage?: string;
   setCurrentPage?: (page: string) => void;
+  user?: User | null;
 }
 
-const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
+const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage, user }) => {
   // isLoading is the initial load, isRefreshing is for subsequent background polls
   const { isRefreshing } = useMarketData();
   const { theme, toggleTheme } = useTheme();
@@ -103,6 +105,27 @@ const Header: React.FC<HeaderProps> = ({ currentPage, setCurrentPage }) => {
                   </svg>
                 )}
               </button>
+
+              {/* Profile/Login Button */}
+              {user ? (
+                <button
+                  onClick={() => setCurrentPage && setCurrentPage('profile')}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+                  title="Profile"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                  <span className="hidden sm:inline">{user.email?.split('@')[0]}</span>
+                </button>
+              ) : (
+                <button
+                  onClick={() => setCurrentPage && setCurrentPage('portfolio')}
+                  className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-medium transition-colors"
+                >
+                  Sign In
+                </button>
+              )}
             </div>
           </div>
         </div>

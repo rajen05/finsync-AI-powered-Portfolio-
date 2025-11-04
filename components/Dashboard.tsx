@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { User } from '@supabase/supabase-js';
 import Header from './Header';
 import Navbar from './Navbar';
 import PortfolioSummary from './PortfolioSummary';
@@ -12,6 +13,9 @@ import MarketData from './MarketData';
 import Heatmap from './Heatmap';
 import Wishlist from './Wishlist';
 import AIAssistant from './AIAssistant';
+import Profile from './Profile';
+import Login from './Login';
+import Signup from './Signup';
 import { Transaction, WishlistItem } from '../types';
 import { usePortfolio } from '../hooks/usePortfolio';
 import { usePortfolioPerformance } from '../hooks/usePortfolioPerformance';
@@ -26,14 +30,47 @@ interface DashboardProps {
   onAddWishlistItem: (item: Omit<WishlistItem, 'id' | 'addedAt'>) => void;
   onRemoveWishlistItem: (id: string) => void;
   onUpdateWishlistItem: (id: string, updates: Partial<WishlistItem>) => void;
+  user: User | null;
+  onShowAuth: (view: 'login' | 'signup') => void;
 }
 
-export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddTransaction, wishlist, onAddWishlistItem, onRemoveWishlistItem, onUpdateWishlistItem }) => {
+export const Dashboard: React.FC<DashboardProps> = ({
+  transactions,
+  onAddTransaction,
+  wishlist,
+  onAddWishlistItem,
+  onRemoveWishlistItem,
+  onUpdateWishlistItem,
+  user,
+  onShowAuth,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState('heatmap');
+  const [currentPage, setCurrentPage] = useState<'heatmap' | 'portfolio' | 'transactions' | 'market' | 'wishlist' | 'profile'>('heatmap');
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [authView, setAuthView] = useState<'login' | 'signup'>('login');
   const [marketSymbol, setMarketSymbol] = useState<string | null>(null);
+
+  // Protected pages that require authentication
+  const protectedPages = ['portfolio', 'transactions', 'wishlist', 'profile'];
+
+  // Handle page navigation with auth check
+  const handlePageChange = (page: typeof currentPage) => {
+    if (protectedPages.includes(page) && !user) {
+      setShowAuthModal(true);
+      setAuthView('login');
+      return;
+    }
+    setCurrentPage(page);
+    setShowAuthModal(false);
+  };
+
+  // Close auth modal and return to public page
+  const handleCloseAuth = () => {
+    setShowAuthModal(false);
+    setCurrentPage('heatmap');
+  };
 
   const { holdings, summary, allocationData, isLoading } = usePortfolio(transactions);
   const { portfolioPrices } = useMarketData();
@@ -48,7 +85,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddTransac
     setMarketSymbol(ticker);
     setCurrentPage('market');
   };
-  
+
   const renderPage = () => {
     switch (currentPage) {
       case 'portfolio':
@@ -94,20 +131,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddTransac
             onUpdateItem={onUpdateWishlistItem}
           />
         );
+      case 'profile':
+        return <Profile />;
       default:
         return null;
     }
   };
 
+  // If showing auth modal, render it fullscreen
+  if (showAuthModal) {
+    return authView === 'login' ? (
+      <Login onSwitchToSignup={() => setAuthView('signup')} />
+    ) : (
+      <Signup onSwitchToLogin={() => setAuthView('login')} />
+    );
+  }
+
   return (
-    <>
-      <Header currentPage={currentPage} setCurrentPage={setCurrentPage} />
-      
+    <div className="flex flex-col h-screen">
+      <Header
+        currentPage={currentPage}
+        setCurrentPage={handlePageChange}
+        user={user}
+      />
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold capitalize text-gray-900 dark:text-white">{currentPage}</h1>
           {currentPage !== 'market' && currentPage !== 'heatmap' && currentPage !== 'wishlist' && (
-             <button
+            <button
               onClick={() => setIsModalOpen(true)}
               className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-md inline-flex items-center transition-colors"
             >
@@ -151,6 +203,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ transactions, onAddTransac
 
       {/* AI Assistant Chat */}
       {isChatOpen && <AIAssistant onClose={() => setIsChatOpen(false)} />}
-    </>
+    </div>
   );
 };
