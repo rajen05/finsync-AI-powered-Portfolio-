@@ -163,23 +163,56 @@ const Heatmap: React.FC = () => {
                     {sectorName} →
                   </div>
                   
-                  {/* Nested Stock Tiles - Tighter Grid */}
-                  <div className="grid gap-0.5 w-full h-full p-0.5" style={{
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(70px, 1fr))',
-                    gridAutoRows: 'minmax(60px, 1fr)'
-                  }}>
+                  {/* Nested Stock Tiles - Variable Sizing Based on Market Cap */}
+                  <div className="flex flex-wrap gap-0.5 w-full h-full p-0.5">
                     {sortedStocks.map(stock => {
                       const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
-                      const isLargeStock = stockPercentage > 25;
-                      const isMediumStock = stockPercentage > 15;
+                      
+                      // Calculate size based on market cap percentage
+                      let minWidth = '60px';
+                      let minHeight = '55px';
+                      let flexGrow = stockPercentage;
+                      let flexBasis = '0';
+                      
+                      if (stockPercentage > 30) {
+                        // Very large stocks
+                        minWidth = '140px';
+                        minHeight = '120px';
+                        flexBasis = '35%';
+                      } else if (stockPercentage > 20) {
+                        // Large stocks
+                        minWidth = '110px';
+                        minHeight = '95px';
+                        flexBasis = '28%';
+                      } else if (stockPercentage > 12) {
+                        // Medium stocks
+                        minWidth = '85px';
+                        minHeight = '75px';
+                        flexBasis = '20%';
+                      } else if (stockPercentage > 7) {
+                        // Small-medium stocks
+                        minWidth = '70px';
+                        minHeight = '60px';
+                        flexBasis = '15%';
+                      } else {
+                        // Small stocks
+                        minWidth = '55px';
+                        minHeight = '50px';
+                        flexBasis = '12%';
+                      }
+                      
+                      const isLargeStock = stockPercentage > 20;
                       
                       return (
                         <div
                           key={stock.ticker}
                           className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 hover:z-50 cursor-pointer p-2 flex flex-col justify-between relative group border border-black/20`}
                           style={{
-                            gridColumn: isLargeStock ? 'span 2' : 'span 1',
-                            gridRow: isLargeStock ? 'span 2' : isMediumStock ? 'span 1' : 'span 1'
+                            flexGrow: flexGrow,
+                            flexBasis: flexBasis,
+                            minWidth: minWidth,
+                            minHeight: minHeight,
+                            maxWidth: stockPercentage > 30 ? '45%' : stockPercentage > 20 ? '35%' : '25%'
                           }}
                         >
                           {/* Top Section: Logo and Ticker */}
