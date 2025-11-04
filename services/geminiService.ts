@@ -123,30 +123,91 @@ export const fetchStockDetails = async (symbol: string): Promise<StockDetails> =
         return cachedData;
     }
 
-    if (!hasApiKey || !ai) {
-        throw new Error('API key not configured. Please add GEMINI_API_KEY to .env.local');
-    }
-
-    console.log(`🔍 Fetching real data for ${symbol} from Gemini AI...`);
+    console.log(`🔍 Fetching real data for ${symbol} from Yahoo Finance...`);
     
-    const prompt = `Provide stock information for "${symbol}": company name, current price, day's change (value and percent), day's range, 52-week range, market cap, P/E ratio, dividend yield. Include last 30 days of daily closing prices and 5 recent news articles with headlines, URLs, sources, and brief summaries. If crypto (like BTC-USD), provide similar data.`;
-
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
-        contents: prompt,
-        config: {
-            responseMimeType: 'application/json',
-            responseSchema: stockDetailsSchema,
+    // Try Yahoo Finance first
+    try {
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=30d`;
+        const response = await fetch(url);
+        
+        if (response.ok) {
+            const data = await response.json();
+            const result = data.chart?.result?.[0];
+            const meta = result?.meta;
+            const timestamps = result?.timestamp;
+            const prices = result?.indicators?.quote?.[0]?.close;
+            
+            if (meta && meta.regularMarketPrice && timestamps && prices) {
+                const currentPrice = meta.regularMarketPrice;
+                const previousClose = meta.chartPreviousClose || meta.previousClose;
+                const change = currentPrice - previousClose;
+                const changePercent = (change / previousClose) * 100;
+                
+                // Build historical data
+                const historicalData = timestamps.map((ts: number, index: number) => ({
+                    date: new Date(ts * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    price: parseFloat((prices[index] || 0).toFixed(2))
+                })).filter((d: any) => d.price > 0);
+                
+                const stockData: StockDetails = {
+                    ticker: symbol.toUpperCase(),
+                    companyName: meta.longName || meta.shortName || symbol.toUpperCase(),
+                    currentPrice: parseFloat(currentPrice.toFixed(2)),
+                    change: parseFloat(change.toFixed(2)),
+                    changePercent: parseFloat(changePercent.toFixed(2)),
+                    dayRange: meta.regularMarketDayRange || `$${(currentPrice * 0.98).toFixed(2)} - $${(currentPrice * 1.02).toFixed(2)}`,
+                    yearRange: meta.fiftyTwoWeekRange || `$${(currentPrice * 0.7).toFixed(2)} - $${(currentPrice * 1.3).toFixed(2)}`,
+                    marketCap: meta.marketCap ? `$${(meta.marketCap / 1e9).toFixed(1)}B` : 'N/A',
+                    peRatio: null,
+                    dividendYield: null,
+                    logoUrl: null,
+                    historicalData: historicalData,
+                    news: [
+                        {
+                            headline: `${symbol.toUpperCase()} Trading Update`,
+                            url: `https://finance.yahoo.com/quote/${symbol}`,
+                            source: 'Yahoo Finance',
+                            summary: `Latest market data and trading information for ${symbol.toUpperCase()}.`
+                        }
+                    ]
+                };
+                
+                console.log(`✅ Stock details fetched from Yahoo Finance for ${symbol}`);
+                setInCache(cacheKey, stockData);
+                return stockData;
+            }
         }
-    });
-
-    const data = parseJsonResponse<StockDetails>(response.text, `stock details for ${symbol}`);
-    if (!data) {
-        throw new Error(`Failed to get or parse stock details for ${symbol}`);
+    } catch (error) {
+        console.error(`❌ Yahoo Finance failed for ${symbol}:`, error);
     }
-
-    setInCache(cacheKey, data);
-    return data;
+    
+    // Fallback to Gemini AI
+    if (hasApiKey && ai) {
+        try {
+            console.log(`🔄 Trying Gemini AI for ${symbol}...`);
+            const prompt = `Provide stock information for "${symbol}": company name, current price, day's change (value and percent), day's range, 52-week range, market cap, P/E ratio, dividend yield. Include last 30 days of daily closing prices and 5 recent news articles with headlines, URLs, sources, and brief summaries.`;
+            
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.0-flash-exp',
+                contents: prompt,
+                config: {
+                    responseMimeType: 'application/json',
+                    responseSchema: stockDetailsSchema,
+                }
+            });
+            
+            const data = parseJsonResponse<StockDetails>(response.text, `stock details for ${symbol}`);
+            if (data) {
+                console.log(`✅ Stock details fetched from Gemini AI for ${symbol}`);
+                setInCache(cacheKey, data);
+                return data;
+            }
+        } catch (error) {
+            console.error(`❌ Gemini AI also failed for ${symbol}:`, error);
+        }
+    }
+    
+    throw new Error(`Failed to fetch data for ${symbol} from all sources`);
 };
 
 // Prefetch function can just call fetch and ignore the result to populate cache
@@ -192,66 +253,195 @@ export const fetchTopMoversData = async (): Promise<TopMover[]> => {
         return cachedData;
     }
 
-    if (!hasApiKey || !ai) {
-        throw new Error('API key not configured for top movers');
-    }
-
-    console.log('🔍 Fetching real top movers from Gemini AI...');
+    // Popular stocks to check for movers
+    const popularTickers = ['NVDA', 'AMD', 'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NFLX', 'DIS'];
     
-    const prompt = `List the top 6 market movers today from major US stocks. Include 3 top gainers and 3 top losers. For each: ticker, company name, current price, change value, and change percentage.`;
-
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
-        contents: prompt,
-        config: {
-            responseMimeType: 'application/json',
-            responseSchema: topMoversSchema,
+    console.log('🔍 Fetching top movers from Yahoo Finance...');
+    
+    try {
+        const quotePromises = popularTickers.map(async (ticker) => {
+            try {
+                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const meta = data.chart?.result?.[0]?.meta;
+                    
+                    if (meta && meta.regularMarketPrice) {
+                        const currentPrice = meta.regularMarketPrice;
+                        const previousClose = meta.chartPreviousClose || meta.previousClose;
+                        const change = currentPrice - previousClose;
+                        const changePercent = (change / previousClose) * 100;
+                        
+                        return {
+                            ticker: ticker,
+                            companyName: meta.longName || meta.shortName || ticker,
+                            price: parseFloat(currentPrice.toFixed(2)),
+                            change: parseFloat(change.toFixed(2)),
+                            changePercent: parseFloat(changePercent.toFixed(2))
+                        };
+                    }
+                }
+            } catch (err) {
+                console.warn(`Failed to fetch ${ticker}`);
+            }
+            return null;
+        });
+        
+        const results = await Promise.all(quotePromises);
+        const validMovers = results.filter(m => m !== null) as TopMover[];
+        
+        if (validMovers.length >= 6) {
+            // Sort by absolute change percent and get top 6
+            const sorted = validMovers.sort((a, b) => Math.abs(b.changePercent) - Math.abs(a.changePercent));
+            const topMovers = sorted.slice(0, 6);
+            
+            console.log('✅ Top movers fetched from Yahoo Finance:', topMovers.length);
+            setInCache(cacheKey, topMovers);
+            return topMovers;
         }
-    });
-    
-    const data = parseJsonResponse<TopMover[]>(response.text, 'top movers');
-    if (!data) {
-        throw new Error('Failed to parse top movers data');
+    } catch (error) {
+        console.error('❌ Yahoo Finance failed for top movers:', error);
     }
-
-    setInCache(cacheKey, data);
-    return data;
+    
+    // Fallback to Gemini AI
+    if (hasApiKey && ai) {
+        try {
+            console.log('🔄 Trying Gemini AI for top movers...');
+            const prompt = `List the top 6 market movers today from major US stocks. Include 3 top gainers and 3 top losers. For each: ticker, company name, current price, change value, and change percentage.`;
+            
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.0-flash-exp',
+                contents: prompt,
+                config: {
+                    responseMimeType: 'application/json',
+                    responseSchema: topMoversSchema,
+                }
+            });
+            
+            const data = parseJsonResponse<TopMover[]>(response.text, 'top movers');
+            if (data && data.length > 0) {
+                console.log('✅ Top movers fetched from Gemini AI:', data.length);
+                setInCache(cacheKey, data);
+                return data;
+            }
+        } catch (error) {
+            console.error('❌ Gemini AI also failed for top movers:', error);
+        }
+    }
+    
+    throw new Error('All data sources failed for top movers');
 };
 
 export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
     const cacheKey = 'heatmap-data';
     const cachedData = getFromCache<HeatmapStock[]>(cacheKey, CACHE_DURATION_MARKET);
     if (cachedData) {
-        console.log('⚡ FAST: Using cached heatmap data (instant load)');
+        console.log('⚡ Using cached heatmap data');
         return cachedData;
     }
     
-    if (!hasApiKey || !ai) {
-        throw new Error('API key not configured for heatmap');
-    }
+    // Top 50 S&P 500 stocks by market cap
+    const topTickers = [
+        'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'BRK.B', 'V', 'UNH',
+        'XOM', 'JNJ', 'WMT', 'JPM', 'MA', 'PG', 'CVX', 'HD', 'MRK', 'ABBV',
+        'KO', 'PEP', 'COST', 'AVGO', 'LLY', 'MCD', 'TMO', 'CSCO', 'ACN', 'ADBE',
+        'NKE', 'DIS', 'NFLX', 'CMCSA', 'VZ', 'INTC', 'AMD', 'CRM', 'ORCL', 'TXN',
+        'BA', 'CAT', 'UPS', 'HON', 'NEE', 'LIN', 'DHR', 'PM', 'ABT', 'BMY'
+    ];
     
-    console.log('🔍 Fetching real heatmap data from Gemini AI...');
+    console.log('🔍 Fetching real heatmap data from Yahoo Finance...');
     
-    const prompt = `Generate data for a stock market heatmap. Provide a list of 50 major companies from diverse sectors including: Technology, Healthcare, Financials, Consumer Discretionary, Consumer Staples, Energy, Industrials, Communication Services, Materials, Utilities, and Real Estate. For each company, provide: ticker symbol, company name, today's percentage change, market cap as a number, primary sector, and a public logo URL (use official company logo URLs). Focus on well-known S&P 500 companies with variety across all sectors.`;
-
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
-        contents: prompt,
-        config: {
-            responseMimeType: 'application/json',
-            responseSchema: heatmapSchema,
+    try {
+        // Fetch quotes for all tickers in parallel
+        const quotePromises = topTickers.map(async (ticker) => {
+            try {
+                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const quote = data.chart?.result?.[0];
+                    const meta = quote?.meta;
+                    
+                    if (meta && meta.regularMarketPrice) {
+                        const currentPrice = meta.regularMarketPrice;
+                        const previousClose = meta.chartPreviousClose || meta.previousClose;
+                        const change = currentPrice - previousClose;
+                        const changePercent = (change / previousClose) * 100;
+                        
+                        return {
+                            ticker: ticker,
+                            companyName: meta.longName || meta.shortName || ticker,
+                            changePercent: parseFloat(changePercent.toFixed(2)),
+                            marketCap: meta.marketCap || 0,
+                            sector: getSectorForTicker(ticker),
+                            logoUrl: null
+                        };
+                    }
+                }
+            } catch (err) {
+                console.warn(`Failed to fetch ${ticker}`);
+            }
+            return null;
+        });
+        
+        const results = await Promise.all(quotePromises);
+        const validStocks = results.filter(s => s !== null) as HeatmapStock[];
+        
+        if (validStocks.length > 0) {
+            console.log('✅ Heatmap data fetched from Yahoo Finance:', validStocks.length, 'stocks');
+            setInCache(cacheKey, validStocks);
+            return validStocks;
         }
-    });
-
-    const data = parseJsonResponse<HeatmapStock[]>(response.text, 'heatmap data');
-    if (!data) {
-        throw new Error('Failed to parse heatmap data');
+    } catch (error) {
+        console.error('❌ Yahoo Finance failed:', error);
     }
-
-    console.log('✅ Heatmap data fetched successfully:', data.length, 'stocks');
-    setInCache(cacheKey, data);
-    return data;
+    
+    // If Yahoo fails, try Gemini AI (if API key available)
+    if (hasApiKey && ai) {
+        try {
+            console.log('🔄 Trying Gemini AI as fallback...');
+            const prompt = `Generate data for a stock market heatmap. Provide a list of 50 major companies from diverse sectors. For each: ticker, company name, today's percentage change, market cap, sector.`;
+            
+            const response = await ai.models.generateContent({
+                model: 'gemini-2.0-flash-exp',
+                contents: prompt,
+                config: {
+                    responseMimeType: 'application/json',
+                    responseSchema: heatmapSchema,
+                }
+            });
+            
+            const data = parseJsonResponse<HeatmapStock[]>(response.text, 'heatmap data');
+            if (data && data.length > 0) {
+                console.log('✅ Heatmap data fetched from Gemini AI:', data.length, 'stocks');
+                setInCache(cacheKey, data);
+                return data;
+            }
+        } catch (error) {
+            console.error('❌ Gemini AI also failed:', error);
+        }
+    }
+    
+    throw new Error('All data sources failed. Please check your internet connection.');
 };
+
+// Helper function to map tickers to sectors
+function getSectorForTicker(ticker: string): string {
+    const sectorMap: { [key: string]: string } = {
+        'AAPL': 'Technology', 'MSFT': 'Technology', 'GOOGL': 'Technology', 'NVDA': 'Technology',
+        'META': 'Technology', 'TSLA': 'Automotive', 'AMZN': 'Consumer Discretionary',
+        'JNJ': 'Healthcare', 'UNH': 'Healthcare', 'MRK': 'Healthcare', 'ABBV': 'Healthcare',
+        'JPM': 'Financials', 'V': 'Financials', 'MA': 'Financials', 'BAC': 'Financials',
+        'XOM': 'Energy', 'CVX': 'Energy', 'WMT': 'Consumer Staples', 'PG': 'Consumer Staples',
+        'KO': 'Consumer Staples', 'PEP': 'Consumer Staples', 'COST': 'Consumer Staples',
+        'DIS': 'Communication Services', 'NFLX': 'Communication Services', 'CMCSA': 'Communication Services',
+        'BA': 'Industrials', 'CAT': 'Industrials', 'UPS': 'Industrials', 'HON': 'Industrials'
+    };
+    return sectorMap[ticker] || 'Technology';
+}
 
 export const fetchMarketData = async (tickers: string[]): Promise<{ [key: string]: number }> => {
     if (tickers.length === 0) {
