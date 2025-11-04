@@ -4,8 +4,9 @@ import { useMarketData } from '../context/MarketDataProvider';
 import { HeatmapStock } from '../types';
 
 const Heatmap: React.FC = () => {
-  const { heatmapData, isLoading, error } = useMarketData();
+  const { heatmapData, isLoading, error, refreshData } = useMarketData();
   const [dataSource, setDataSource] = useState<string>('Loading...');
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
 
   // Detect data source from console logs
   useEffect(() => {
@@ -13,12 +14,27 @@ const Heatmap: React.FC = () => {
       // Check localStorage to see if data was cached
       const cached = localStorage.getItem('heatmap-data');
       if (cached) {
-        setDataSource('Cached Data');
+        const cacheData = JSON.parse(cached);
+        const cacheAge = Date.now() - cacheData.timestamp;
+        if (cacheAge < 60000) { // Less than 1 minute
+          setDataSource('Live Data');
+        } else {
+          setDataSource('Cached Data');
+        }
+        setLastUpdate(new Date(cacheData.timestamp));
       } else {
         setDataSource('Live Data');
+        setLastUpdate(new Date());
       }
     }
   }, [heatmapData]);
+
+  const handleRefresh = () => {
+    // Clear cache and refresh
+    localStorage.removeItem('heatmap-data');
+    localStorage.removeItem('top-movers');
+    refreshData();
+  };
 
   const sectors = useMemo(() => {
     if (!heatmapData) return {};
@@ -79,7 +95,20 @@ const Heatmap: React.FC = () => {
           <p className="text-xs text-slate-400">Size: Market Cap • Color: % Change</p>
         </div>
         
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
+          {/* Refresh Button */}
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 rounded-lg transition-colors"
+            title="Refresh data"
+          >
+            <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+            <span className="text-xs font-medium">Refresh</span>
+          </button>
+          
           {/* Data Source Indicator */}
           <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>

@@ -5,6 +5,10 @@ interface CacheItem<T> {
   timestamp: number;
 }
 
+export const CACHE_DURATION_MARKET = 1 * 60 * 1000; // 1 minute for market data (real-time)
+export const CACHE_DURATION_DETAILS = 1 * 60 * 1000; // 1 minute for stock details (real-time)
+export const CACHE_DURATION_ANALYSIS = 5 * 60 * 1000; // 5 minutes for AI analysis
+
 /**
  * Stores an item in the cache (localStorage).
  * @param key The key to store the item under.

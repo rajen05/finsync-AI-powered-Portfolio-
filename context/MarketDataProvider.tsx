@@ -9,6 +9,7 @@ interface MarketDataContextType {
   isLoading: boolean;
   error: string | null;
   isRefreshing: boolean;
+  refreshData: () => void;
 }
 
 const MarketDataContext = createContext<MarketDataContextType | undefined>(undefined);
@@ -104,6 +105,11 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
     return () => clearInterval(intervalId);
   }, [fetchData]);
 
+  const refreshData = useCallback(() => {
+    console.log('🔄 Manual refresh triggered');
+    fetchData(false);
+  }, [fetchData]);
+
   const value = useMemo(() => ({
     heatmapData,
     topMovers,
@@ -111,7 +117,8 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
     isLoading,
     error,
     isRefreshing,
-  }), [heatmapData, topMovers, portfolioPrices, isLoading, error, isRefreshing]);
+    refreshData,
+  }), [heatmapData, topMovers, portfolioPrices, isLoading, error, isRefreshing, refreshData]);
 
   return (
     <MarketDataContext.Provider value={value}>
