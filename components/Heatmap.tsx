@@ -89,46 +89,48 @@ const Heatmap: React.FC = () => {
 
   return (
     <div className="bg-slate-900 rounded-lg shadow-lg border border-slate-700 overflow-hidden">
-      {/* Compact Header */}
-      <div className="bg-slate-800 border-b border-slate-700 px-4 py-2 flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-white">Market Heatmap</h2>
-          <p className="text-xs text-slate-400">Size: Market Cap • Color: % Change</p>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          {/* Refresh Button */}
-          <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 rounded-lg transition-colors text-sm"
-            title="Refresh data"
-          >
-            <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-            </svg>
-            <span className="text-xs font-medium">Refresh</span>
-          </button>
+      {/* Header */}
+      <div className="bg-gradient-to-r from-slate-800 to-slate-900 border-b border-slate-700 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white mb-0.5">Market Heatmap</h2>
+            <p className="text-xs text-slate-400">Size: Market Cap • Color: % Change</p>
+          </div>
           
-          {/* Data Source Indicator */}
-          <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full">
-            <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-            <span className="text-xs text-slate-300 font-medium">{dataSource}</span>
-            <span className="text-xs text-slate-500">• {heatmapData?.length || 0} stocks</span>
+          <div className="flex items-center gap-3">
+            {/* Refresh Button */}
+            <button
+              onClick={handleRefresh}
+              disabled={isLoading}
+              className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 rounded-lg transition-colors text-sm"
+              title="Refresh data"
+            >
+              <svg className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              <span className="text-xs font-medium">Refresh</span>
+            </button>
+            
+            {/* Data Source Indicator */}
+            <div className="flex items-center gap-2 px-3 py-1 bg-slate-700 rounded-full">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span className="text-xs text-slate-300 font-medium">{dataSource}</span>
+              <span className="text-xs text-slate-500">• {heatmapData?.length || 0} stocks</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* TradingView-style Treemap */}
       <div 
-        className="bg-slate-950 p-1 overflow-auto" 
+        className="bg-slate-950 p-1 overflow-hidden" 
         style={{ 
-          height: 'calc(100vh - 180px)'
+          height: 'calc(100vh - 200px)'
         }}
       >
-        <div className="grid gap-1" style={{
+        <div className="grid gap-1 h-full" style={{
           gridTemplateColumns: 'repeat(5, 1fr)',
-          gridAutoRows: 'minmax(100px, auto)',
+          gridAutoRows: '1fr',
           gridAutoFlow: 'dense'
         }}>
           {Object.entries(sectors)
@@ -226,26 +228,32 @@ const Heatmap: React.FC = () => {
 
                         {/* Tooltip */}
                         <div 
-                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-slate-900 text-white text-xs p-3 rounded-lg shadow-2xl border border-slate-600 z-[999] min-w-[200px]"
-                          style={{ pointerEvents: 'none' }}
+                          className="fixed hidden group-hover:block bg-slate-900/98 backdrop-blur-sm text-white text-xs p-3 rounded-lg shadow-2xl border border-slate-600 min-w-[200px]"
+                          style={{ 
+                            pointerEvents: 'none',
+                            zIndex: 99999,
+                            left: '50%',
+                            top: '50%',
+                            transform: 'translate(-50%, -120%)'
+                          }}
                         >
                           <div className="font-bold text-sm mb-2 border-b border-slate-700 pb-1">{stock.companyName}</div>
                           <div className="space-y-1">
-                            <div className="flex justify-between">
+                            <div className="flex justify-between gap-3">
                               <span className="text-slate-400">Symbol:</span>
                               <span className="font-semibold">{stock.ticker}</span>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between gap-3">
                               <span className="text-slate-400">Sector:</span>
                               <span className="font-semibold text-[10px]">{sectorName}</span>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between gap-3">
                               <span className="text-slate-400">Market Cap:</span>
                               <span className="font-semibold">
                                 {stock.marketCap > 0 ? `$${(stock.marketCap / 1e9).toFixed(2)}B` : 'N/A'}
                               </span>
                             </div>
-                            <div className="flex justify-between">
+                            <div className="flex justify-between gap-3">
                               <span className="text-slate-400">Change:</span>
                               <span className={`font-bold ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
                                 {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
