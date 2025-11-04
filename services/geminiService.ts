@@ -4,6 +4,7 @@ import { StockDetails, NewsArticle, HeatmapStock, TopMover } from '../types';
 import { getFromCache, setInCache } from './cachingService';
 import { fetchCryptoPrices, isCrypto } from './cryptoService';
 import { fetchStockPricesWithFallback } from './stockService';
+import { getStockLogoUrl } from './logoService';
 
 // Helper function to fetch from Yahoo Finance via our serverless API
 async function fetchYahooFinance(symbol: string, range: string = '1d', interval: string = '1d') {
@@ -390,7 +391,7 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
                             changePercent: parseFloat(changePercent.toFixed(2)),
                             marketCap: meta.marketCap || 0,
                             sector: getSectorForTicker(ticker),
-                            logoUrl: null
+                            logoUrl: getStockLogoUrl(ticker)
                         };
                     }
                 }

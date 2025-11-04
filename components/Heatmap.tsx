@@ -121,12 +121,12 @@ const Heatmap: React.FC = () => {
 
       {/* TradingView-style Treemap */}
       <div 
-        className="p-2 bg-slate-900 overflow-auto" 
+        className="p-1 bg-slate-950 overflow-auto" 
         style={{ 
           height: 'calc(100vh - 180px)'
         }}
       >
-        <div className="flex flex-wrap gap-1" style={{ minHeight: '100%' }}>
+        <div className="flex flex-wrap gap-0.5" style={{ minHeight: '100%' }}>
           {Object.entries(sectors)
             .sort(([, a], [, b]) => {
               const sumA = a.reduce((sum, s) => sum + s.marketCap, 0);
@@ -139,78 +139,116 @@ const Heatmap: React.FC = () => {
               const sectorPercentage = (totalSectorCap / totalMarketCap) * 100;
               
               // Calculate flex-basis for proportional sizing
-              const flexBasis = `${Math.max(sectorPercentage, 8)}%`;
+              const flexBasis = `${Math.max(sectorPercentage, 10)}%`;
 
               return (
                 <div 
                   key={sectorName} 
-                  className="border-2 border-slate-700 relative"
+                  className="border border-slate-700/50 relative bg-slate-900/30"
                   style={{
                     flexGrow: sectorPercentage,
                     flexBasis: flexBasis,
-                    minWidth: '180px',
-                    minHeight: '200px',
+                    minWidth: '200px',
+                    minHeight: '180px',
                     display: 'flex',
                     flexDirection: 'column'
                   }}
                 >
                   {/* Sector Label - Top Left Corner */}
-                  <div className="absolute top-1 left-1 text-[10px] font-bold text-white bg-slate-900/80 px-2 py-0.5 rounded z-10 backdrop-blur-sm">
+                  <div className="absolute top-1.5 left-1.5 text-[9px] font-semibold text-white/90 bg-slate-900/70 px-1.5 py-0.5 rounded z-10 backdrop-blur-sm border border-slate-700/30">
                     {sectorName} →
                   </div>
                   
                   {/* Nested Stock Tiles */}
-                  <div className="flex flex-wrap w-full h-full">
+                  <div className="flex flex-wrap w-full h-full gap-0.5 p-0.5">
                     {sortedStocks.map(stock => {
                       const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
-                      const stockFlexBasis = `${Math.max(stockPercentage, 15)}%`;
+                      const stockFlexBasis = `${Math.max(stockPercentage, 18)}%`;
+                      const isLargeStock = stockPercentage > 30;
                       
                       return (
                         <div
                           key={stock.ticker}
-                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:opacity-90 hover:z-50 cursor-pointer p-2 flex flex-col justify-between relative group border border-black/30`}
+                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 hover:z-50 cursor-pointer p-2.5 flex flex-col justify-between relative group border border-black/20`}
                           style={{
                             flexGrow: stockPercentage,
                             flexBasis: stockFlexBasis,
-                            minWidth: '80px',
-                            minHeight: '80px'
+                            minWidth: isLargeStock ? '120px' : '85px',
+                            minHeight: isLargeStock ? '100px' : '70px'
                           }}
                         >
-                          {/* Ticker */}
-                          <div className="font-bold text-xs tracking-wide">
-                            {stock.ticker}
+                          {/* Top Section: Logo and Ticker */}
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex flex-col">
+                              <div className="font-bold text-sm tracking-tight mb-0.5">
+                                {stock.ticker}
+                              </div>
+                              {isLargeStock && (
+                                <div className="text-[9px] opacity-80 leading-tight max-w-[100px] truncate">
+                                  {stock.companyName}
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Stock Logo */}
+                            <div className="w-8 h-8 bg-white/95 rounded-md flex items-center justify-center shadow-sm flex-shrink-0 relative overflow-hidden">
+                              {stock.logoUrl ? (
+                                <img 
+                                  src={stock.logoUrl} 
+                                  alt={stock.ticker}
+                                  className="w-full h-full object-contain p-1"
+                                  onError={(e) => { 
+                                    // Fallback to ticker letter if logo fails
+                                    e.currentTarget.style.display = 'none';
+                                  }}
+                                />
+                              ) : null}
+                              {/* Fallback letter - always rendered underneath */}
+                              <span className="absolute inset-0 flex items-center justify-center text-slate-800 font-bold text-xs">
+                                {stock.ticker.charAt(0)}
+                              </span>
+                            </div>
                           </div>
                           
-                          {/* Percentage */}
-                          <div className="font-bold text-sm mt-auto" style={{
-                            textShadow: '0 1px 2px rgba(0,0,0,0.5)'
+                          {/* Bottom Section: Percentage */}
+                          <div className="font-bold text-base mt-auto" style={{
+                            textShadow: '0 1px 3px rgba(0,0,0,0.6)'
                           }}>
                             {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                           </div>
 
-                          {/* Hover Tooltip */}
-                          <div className="absolute hidden group-hover:block bg-slate-950 text-white text-xs p-2 rounded shadow-2xl z-[100] w-40 border border-slate-600 pointer-events-none" 
+                          {/* Enhanced Hover Tooltip */}
+                          <div className="absolute hidden group-hover:block bg-slate-900 text-white text-xs p-3 rounded-lg shadow-2xl z-[100] w-48 border border-slate-600 pointer-events-none" 
                             style={{
                               top: '100%',
-                              marginTop: '4px',
+                              marginTop: '6px',
                               left: '50%',
                               transform: 'translateX(-50%)'
                             }}>
-                            <div className="font-bold text-xs mb-1 truncate">{stock.companyName}</div>
-                            <div className="text-slate-300 space-y-0.5 text-[10px]">
-                              <div className="flex justify-between">
-                                <span>Ticker:</span>
+                            {/* Tooltip Arrow */}
+                            <div className="absolute -top-1 left-1/2 transform -translate-x-1/2">
+                              <div className="w-2 h-2 bg-slate-900 border-l border-t border-slate-600 rotate-45"></div>
+                            </div>
+                            
+                            <div className="font-bold text-sm mb-2 truncate">{stock.companyName}</div>
+                            <div className="text-slate-300 space-y-1 text-[11px]">
+                              <div className="flex justify-between items-center">
+                                <span className="text-slate-400">Ticker:</span>
                                 <span className="text-white font-semibold">{stock.ticker}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span>Cap:</span>
-                                <span className="text-white font-semibold">${(stock.marketCap / 1e9).toFixed(1)}B</span>
+                              <div className="flex justify-between items-center">
+                                <span className="text-slate-400">Market Cap:</span>
+                                <span className="text-white font-semibold">${(stock.marketCap / 1e9).toFixed(2)}B</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span>Change:</span>
-                                <span className={`font-semibold ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                              <div className="flex justify-between items-center">
+                                <span className="text-slate-400">Change:</span>
+                                <span className={`font-bold ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
                                   {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                                 </span>
+                              </div>
+                              <div className="flex justify-between items-center pt-1 border-t border-slate-700">
+                                <span className="text-slate-400">Sector:</span>
+                                <span className="text-white text-[10px]">{sectorName}</span>
                               </div>
                             </div>
                           </div>
