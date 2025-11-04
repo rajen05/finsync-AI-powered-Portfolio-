@@ -163,7 +163,8 @@ const Heatmap: React.FC = () => {
                   className="border-2 border-slate-700 relative bg-slate-900/30 flex flex-col"
                   style={{
                     gridColumn: `span ${colSpan}`,
-                    gridRow: `span ${rowSpan}`
+                    gridRow: `span ${rowSpan}`,
+                    overflow: 'visible'
                   }}
                 >
                   {/* Sector Label - Outside content area */}
@@ -172,10 +173,11 @@ const Heatmap: React.FC = () => {
                   </div>
                   
                   {/* Stock Tiles Grid */}
-                  <div className="grid gap-0.5 flex-1 p-0.5 overflow-hidden" style={{
+                  <div className="grid gap-0.5 flex-1 p-0.5" style={{
                     gridTemplateColumns: colSpan > 1 ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
                     gridAutoRows: 'minmax(60px, 1fr)',
-                    gridAutoFlow: 'dense'
+                    gridAutoFlow: 'dense',
+                    overflow: 'visible'
                   }}>
                     {sortedStocks.map(stock => {
                       const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
