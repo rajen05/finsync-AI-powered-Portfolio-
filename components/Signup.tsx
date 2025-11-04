@@ -42,10 +42,8 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin }) => {
     } else {
       setSuccess(true)
       setLoading(false)
-      // Auto-switch to login after 2 seconds
-      setTimeout(() => {
-        onSwitchToLogin()
-      }, 2000)
+      // User will be automatically logged in by Supabase
+      // The Dashboard will handle navigation via useEffect
     }
   }
 
@@ -150,7 +148,7 @@ const Signup: React.FC<SignupProps> = ({ onSwitchToLogin }) => {
           {success && (
             <div className="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
               <p className="text-sm text-green-600 dark:text-green-400">
-                ✅ Account created successfully! Redirecting to login...
+                ✅ Account created successfully! Logging you in...
               </p>
             </div>
           )}

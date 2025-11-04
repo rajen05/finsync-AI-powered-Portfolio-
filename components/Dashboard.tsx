@@ -72,6 +72,19 @@ export const Dashboard: React.FC<DashboardProps> = ({
     setCurrentPage('heatmap');
   };
 
+  // When user logs in, close auth modal and go to portfolio
+  // When user logs out, go to heatmap (first page)
+  useEffect(() => {
+    if (user && showAuthModal) {
+      setShowAuthModal(false);
+      setCurrentPage('portfolio');
+    } else if (!user) {
+      // User logged out, go to public page
+      setCurrentPage('heatmap');
+      setShowAuthModal(false);
+    }
+  }, [user]);
+
   const { holdings, summary, allocationData, isLoading } = usePortfolio(transactions);
   const { portfolioPrices } = useMarketData();
   const performanceData = usePortfolioPerformance(transactions, portfolioPrices);
