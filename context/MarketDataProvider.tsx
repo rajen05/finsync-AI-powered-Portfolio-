@@ -18,8 +18,8 @@ interface MarketDataProviderProps {
   portfolioTickers: string[];
 }
 
-// Polling interval: 30 seconds.
-const POLLING_INTERVAL = 30 * 1000;
+// Polling interval: 5 minutes (reduced frequency to avoid excessive API calls)
+const POLLING_INTERVAL = 5 * 60 * 1000;
 
 export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children, portfolioTickers }) => {
   const [heatmapData, setHeatmapData] = useState<HeatmapStock[] | null>(null);
@@ -33,6 +33,8 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
   const portfolioTickersString = useMemo(() => portfolioTickers.sort().join(','), [portfolioTickers]);
 
   const fetchData = useCallback(async (isInitialLoad: boolean) => {
+    console.log('📊 MarketDataProvider: Starting data fetch', { isInitialLoad });
+    
     if (!isInitialLoad) {
       setIsRefreshing(true);
     }
@@ -48,7 +50,19 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
         tickers.length > 0 ? fetchMarketData(tickers) : Promise.resolve({}),
       ]);
 
-      if (results[0].status === 'fulfilled') setHeatmapData(results[0].value);
+      console.log('📊 MarketDataProvider: Fetch results', {
+        heatmap: results[0].status,
+        topMovers: results[1].status,
+        portfolioPrices: results[2].status
+      });
+
+      if (results[0].status === 'fulfilled') {
+        console.log('✅ Heatmap data received:', results[0].value?.length, 'items');
+        setHeatmapData(results[0].value);
+      } else {
+        console.error('❌ Heatmap fetch failed:', results[0].reason);
+      }
+      
       if (results[1].status === 'fulfilled') setTopMovers(results[1].value);
       if (results[2].status === 'fulfilled') setPortfolioPrices(results[2].value);
 
@@ -64,6 +78,7 @@ export const MarketDataProvider: React.FC<MarketDataProviderProps> = ({ children
     } finally {
       if (isInitialLoad) setIsLoading(false);
       setIsRefreshing(false);
+      console.log('📊 MarketDataProvider: Fetch complete');
     }
   }, [portfolioTickersString]);
 

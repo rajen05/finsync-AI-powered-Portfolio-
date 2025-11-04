@@ -3,7 +3,16 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, '.', '');
+    // Load env file based on `mode` in the current working directory.
+    // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
+    const env = loadEnv(mode, process.cwd(), '');
+    
+    console.log('🔧 Vite Config - Loading environment variables:', {
+        mode,
+        GEMINI_API_KEY_exists: !!env.GEMINI_API_KEY,
+        GEMINI_API_KEY_length: env.GEMINI_API_KEY?.length || 0
+    });
+    
     return {
       server: {
         port: 3000,
