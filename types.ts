@@ -16,7 +16,8 @@ export interface Transaction {
   quantity: number;
   price: number;
   date: string;
-  broker: string;
+  broker?: string;
+  notes?: string;
 }
 
 export interface Holding {
