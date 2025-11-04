@@ -128,8 +128,8 @@ const Heatmap: React.FC = () => {
       >
         <div className="grid gap-1" style={{
           gridTemplateColumns: 'repeat(5, 1fr)',
-          gridAutoRows: 'minmax(70px, auto)',
-          height: '100%'
+          gridAutoRows: 'minmax(100px, auto)',
+          gridAutoFlow: 'dense'
         }}>
           {Object.entries(sectors)
             .sort(([, a], [, b]) => {
@@ -172,9 +172,10 @@ const Heatmap: React.FC = () => {
                   </div>
                   
                   {/* Stock Tiles Grid */}
-                  <div className="grid gap-0.5 flex-1 p-0.5" style={{
+                  <div className="grid gap-0.5 flex-1 p-0.5 overflow-hidden" style={{
                     gridTemplateColumns: colSpan > 1 ? 'repeat(4, 1fr)' : 'repeat(2, 1fr)',
-                    gridAutoRows: 'minmax(55px, 1fr)'
+                    gridAutoRows: 'minmax(60px, 1fr)',
+                    gridAutoFlow: 'dense'
                   }}>
                     {sortedStocks.map(stock => {
                       const stockPercentage = (stock.marketCap / totalSectorCap) * 100;
@@ -183,16 +184,17 @@ const Heatmap: React.FC = () => {
                       return (
                         <div
                           key={stock.ticker}
-                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-1.5 flex flex-col justify-between relative group border border-black/20`}
+                          className={`${getColor(stock.changePercent)} ${getTextColor(stock.changePercent)} transition-all hover:brightness-110 cursor-pointer p-2 flex flex-col justify-between relative group border border-black/20 overflow-hidden`}
                           style={{
                             gridColumn: isLarge ? 'span 2' : 'span 1',
-                            gridRow: isLarge ? 'span 2' : 'span 1'
+                            gridRow: isLarge ? 'span 2' : 'span 1',
+                            minHeight: '60px'
                           }}
                         >
                         {/* Ticker and Logo */}
-                        <div className="flex items-start justify-between gap-1">
-                          <div className="font-bold text-xs">{stock.ticker}</div>
-                          <div className="w-6 h-6 bg-white/95 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <div className="flex items-start justify-between gap-1 min-h-0">
+                          <div className="font-bold text-xs truncate flex-1">{stock.ticker}</div>
+                          <div className="w-5 h-5 bg-white/95 rounded flex items-center justify-center flex-shrink-0 overflow-hidden">
                             {stock.logoUrl ? (
                               <img 
                                 src={stock.logoUrl} 
@@ -201,12 +203,12 @@ const Heatmap: React.FC = () => {
                                 onError={(e) => { 
                                   const parent = e.currentTarget.parentElement;
                                   if (parent) {
-                                    parent.innerHTML = `<span class="text-slate-800 font-bold text-[10px]">${stock.ticker.charAt(0)}</span>`;
+                                    parent.innerHTML = `<span class="text-slate-800 font-bold text-[9px]">${stock.ticker.charAt(0)}</span>`;
                                   }
                                 }}
                               />
                             ) : (
-                              <span className="text-slate-800 font-bold text-[10px]">
+                              <span className="text-slate-800 font-bold text-[9px]">
                                 {stock.ticker.charAt(0)}
                               </span>
                             )}
@@ -214,7 +216,7 @@ const Heatmap: React.FC = () => {
                         </div>
                         
                         {/* Percentage */}
-                        <div className="font-bold text-sm" style={{textShadow: '0 1px 2px rgba(0,0,0,0.6)'}}>
+                        <div className="font-bold text-xs truncate" style={{textShadow: '0 1px 2px rgba(0,0,0,0.6)'}}>
                           {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
                         </div>
 
