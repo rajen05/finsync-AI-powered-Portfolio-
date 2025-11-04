@@ -224,12 +224,31 @@ const Heatmap: React.FC = () => {
 
                         {/* Tooltip */}
                         <div 
-                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-slate-800 text-white text-xs p-2 rounded shadow-xl border border-slate-600 whitespace-nowrap z-[999]"
+                          className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block bg-slate-900 text-white text-xs p-3 rounded-lg shadow-2xl border border-slate-600 z-[999] min-w-[200px]"
                           style={{ pointerEvents: 'none' }}
                         >
-                          <div className="font-bold">{stock.companyName}</div>
-                          <div className="text-slate-300 mt-1">
-                            Cap: ${(stock.marketCap / 1e9).toFixed(2)}B
+                          <div className="font-bold text-sm mb-2 border-b border-slate-700 pb-1">{stock.companyName}</div>
+                          <div className="space-y-1">
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Symbol:</span>
+                              <span className="font-semibold">{stock.ticker}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Sector:</span>
+                              <span className="font-semibold text-[10px]">{sectorName}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Market Cap:</span>
+                              <span className="font-semibold">
+                                {stock.marketCap > 0 ? `$${(stock.marketCap / 1e9).toFixed(2)}B` : 'N/A'}
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-slate-400">Change:</span>
+                              <span className={`font-bold ${stock.changePercent > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                {stock.changePercent > 0 ? '+' : ''}{stock.changePercent.toFixed(2)}%
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>

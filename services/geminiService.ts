@@ -388,11 +388,17 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
                         const change = currentPrice - previousClose;
                         const changePercent = (change / previousClose) * 100;
                         
+                        // Fallback market cap if not provided by API
+                        let marketCap = meta.marketCap || 0;
+                        if (!marketCap || marketCap === 0) {
+                            marketCap = getEstimatedMarketCap(ticker);
+                        }
+                        
                         return {
                             ticker: ticker,
                             companyName: meta.longName || meta.shortName || ticker,
                             changePercent: parseFloat(changePercent.toFixed(2)),
-                            marketCap: meta.marketCap || 0,
+                            marketCap: marketCap,
                             sector: getSectorForTicker(ticker),
                             logoUrl: getStockLogoUrl(ticker)
                         };
@@ -446,6 +452,29 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
     
     throw new Error('All data sources failed. Yahoo Finance blocked and Gemini AI unavailable.');
 };
+
+// Helper function to get estimated market cap (in dollars) when API doesn't provide it
+function getEstimatedMarketCap(ticker: string): number {
+    const marketCaps: { [key: string]: number } = {
+        'AAPL': 3500e9, 'MSFT': 3200e9, 'GOOGL': 2100e9, 'AMZN': 1900e9, 'NVDA': 3000e9,
+        'META': 1300e9, 'TSLA': 800e9, 'BRK.B': 900e9, 'V': 600e9, 'UNH': 500e9,
+        'XOM': 450e9, 'JNJ': 400e9, 'WMT': 550e9, 'JPM': 550e9, 'MA': 450e9,
+        'PG': 400e9, 'CVX': 300e9, 'HD': 380e9, 'MRK': 280e9, 'ABBV': 320e9,
+        'KO': 280e9, 'PEP': 250e9, 'COST': 380e9, 'AVGO': 700e9, 'LLY': 650e9,
+        'MCD': 220e9, 'TMO': 220e9, 'CSCO': 220e9, 'ACN': 210e9, 'ADBE': 240e9,
+        'NKE': 180e9, 'DIS': 200e9, 'NFLX': 280e9, 'CMCSA': 180e9, 'VZ': 180e9,
+        'INTC': 180e9, 'AMD': 280e9, 'CRM': 280e9, 'ORCL': 350e9, 'TXN': 180e9,
+        'BA': 140e9, 'CAT': 160e9, 'UPS': 140e9, 'HON': 150e9, 'NEE': 160e9,
+        'LIN': 200e9, 'DHR': 180e9, 'PM': 160e9, 'ABT': 180e9, 'BMY': 110e9,
+        'QCOM': 200e9, 'RTX': 140e9, 'SBUX': 110e9, 'INTU': 180e9, 'AMGN': 140e9,
+        'LOW': 140e9, 'SPGI': 140e9, 'GE': 180e9, 'NOW': 160e9, 'BKNG': 140e9,
+        'GILD': 100e9, 'AXP': 160e9, 'BLK': 130e9, 'MDLZ': 90e9, 'ISRG': 140e9,
+        'TJX': 110e9, 'MMM': 80e9, 'CVS': 90e9, 'PLD': 130e9, 'CB': 90e9,
+        'SYK': 120e9, 'CI': 90e9, 'ZTS': 90e9, 'MO': 90e9, 'REGN': 100e9,
+        'VRTX': 120e9, 'DUK': 80e9, 'SO': 80e9, 'PNC': 70e9, 'USB': 70e9
+    };
+    return marketCaps[ticker] || 100e9; // Default to 100B if not found
+}
 
 // Helper function to map tickers to sectors
 function getSectorForTicker(ticker: string): string {
