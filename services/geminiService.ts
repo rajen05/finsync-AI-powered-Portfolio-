@@ -5,17 +5,22 @@ import { getFromCache, setInCache } from './cachingService';
 import { fetchCryptoPrices, isCrypto } from './cryptoService';
 import { fetchStockPricesWithFallback } from './stockService';
 
-// CORS proxy to bypass browser restrictions
-const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
-
-// Helper function to fetch with CORS proxy
-async function fetchWithProxy(url: string) {
+// Helper function to fetch from Yahoo Finance via our serverless API
+async function fetchYahooFinance(symbol: string, range: string = '1d', interval: string = '1d') {
     try {
-        const response = await fetch(CORS_PROXY + encodeURIComponent(url));
-        return response;
+        // Use our serverless function (works in production on Vercel)
+        const apiUrl = `/api/yahoo-finance?symbol=${symbol}&range=${range}&interval=${interval}`;
+        console.log(`🔍 Fetching ${symbol} via serverless API...`);
+        const response = await fetch(apiUrl);
+        
+        if (response.ok) {
+            return await response.json();
+        }
+        
+        throw new Error(`API returned ${response.status}`);
     } catch (error) {
-        console.warn('CORS proxy failed, trying direct fetch...');
-        return fetch(url);
+        console.error(`❌ Serverless API failed for ${symbol}:`, error);
+        throw error;
     }
 }
 
@@ -137,16 +142,14 @@ export const fetchStockDetails = async (symbol: string): Promise<StockDetails> =
         return cachedData;
     }
 
-    // Priority 1: Try Yahoo Finance with CORS proxy
+    // Priority 1: Try Yahoo Finance via serverless API
     console.log(`🔍 PRIMARY: Fetching ${symbol} from Yahoo Finance...`);
     
     try {
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=30d`;
-        const response = await fetchWithProxy(url);
+        const data = await fetchYahooFinance(symbol, '30d', '1d');
         
-        if (response.ok) {
-            const data = await response.json();
-            const result = data.chart?.result?.[0];
+        if (data && data.chart?.result?.[0]) {
+            const result = data.chart.result[0];
             const meta = result?.meta;
             const timestamps = result?.timestamp;
             const prices = result?.indicators?.quote?.[0]?.close;
@@ -268,18 +271,16 @@ export const fetchTopMoversData = async (): Promise<TopMover[]> => {
 
     const popularTickers = ['NVDA', 'AMD', 'TSLA', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'NFLX', 'DIS'];
     
-    // Priority 1: Try Yahoo Finance with CORS proxy
+    // Priority 1: Try Yahoo Finance via serverless API
     console.log('🔍 PRIMARY: Fetching top movers from Yahoo Finance...');
     
     try {
         const quotePromises = popularTickers.map(async (ticker) => {
             try {
-                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-                const response = await fetchWithProxy(url);
+                const data = await fetchYahooFinance(ticker, '1d', '1d');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    const meta = data.chart?.result?.[0]?.meta;
+                if (data && data.chart?.result?.[0]) {
+                    const meta = data.chart.result[0]?.meta;
                     
                     if (meta && meta.regularMarketPrice) {
                         const currentPrice = meta.regularMarketPrice;
@@ -365,18 +366,16 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
         'BA', 'CAT', 'UPS', 'HON', 'NEE', 'LIN', 'DHR', 'PM', 'ABT', 'BMY'
     ];
     
-    // Priority 1: Try Yahoo Finance with CORS proxy
+    // Priority 1: Try Yahoo Finance via serverless API
     console.log('🔍 PRIMARY: Fetching heatmap data from Yahoo Finance...');
     
     try {
         const quotePromises = topTickers.map(async (ticker) => {
             try {
-                const url = `https://query1.finance.yahoo.com/v8/finance/chart/${ticker}?interval=1d&range=1d`;
-                const response = await fetchWithProxy(url);
+                const data = await fetchYahooFinance(ticker, '1d', '1d');
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    const quote = data.chart?.result?.[0];
+                if (data && data.chart?.result?.[0]) {
+                    const quote = data.chart.result[0];
                     const meta = quote?.meta;
                     
                     if (meta && meta.regularMarketPrice) {

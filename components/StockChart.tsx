@@ -22,16 +22,13 @@ const StockChart: React.FC<StockChartProps> = ({ data, changePercent, symbol }) 
   const fetchHistoricalData = async (range: TimeRange) => {
     setLoading(true);
     try {
-      // Fetch from Yahoo Finance with CORS proxy
+      // Fetch from Yahoo Finance via serverless API
       const interval = range === '1D' ? '5m' : range === '1W' ? '1h' : '1d';
       const yahooRange = range === '1D' ? '1d' : range === '1W' ? '5d' : range === '1M' ? '1mo' : range === '3M' ? '3mo' : range === '1Y' ? '1y' : range === '5Y' ? '5y' : 'max';
       
-      const yahooUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${yahooRange}`;
-      const corsProxy = 'https://api.allorigins.win/raw?url=';
-      const url = corsProxy + encodeURIComponent(yahooUrl);
-      
       console.log(`📊 Fetching ${range} data for ${symbol}...`);
-      const response = await fetch(url);
+      const apiUrl = `/api/yahoo-finance?symbol=${symbol}&range=${yahooRange}&interval=${interval}`;
+      const response = await fetch(apiUrl);
       
       if (response.ok) {
         const result = await response.json();
