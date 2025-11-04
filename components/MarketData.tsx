@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import StockDetailView from './StockDetailView';
 import MarketNews from './MarketNews';
-import { SearchIcon } from './icons/SearchIcon';
+import StockSearch from './StockSearch';
 import { prefetchStockDetails } from '../services/geminiService';
 import { useMarketData } from '../context/MarketDataProvider';
 
@@ -37,18 +37,13 @@ const MarketData: React.FC<MarketDataProps> = ({ symbol, setSymbol }) => {
   return (
     <div className="space-y-6">
       <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-lg border border-gray-200 dark:border-slate-700 transition-colors">
-        <form onSubmit={handleSearch} className="flex items-center">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder="Search for a stock or crypto symbol (e.g. AAPL, BTC-USD)"
-            className="w-full bg-gray-100 dark:bg-slate-700 border-gray-300 dark:border-slate-600 rounded-l-md shadow-sm py-2 px-3 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-          />
-          <button type="submit" className="bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded-r-md inline-flex items-center transition-colors">
-            <SearchIcon />
-          </button>
-        </form>
+        <StockSearch 
+          value={inputValue}
+          onSelect={(selectedSymbol) => {
+            setInputValue(selectedSymbol)
+            setSymbol(selectedSymbol)
+          }}
+        />
       </div>
 
       {symbol ? (
