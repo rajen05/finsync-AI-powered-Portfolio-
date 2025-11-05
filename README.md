@@ -1,16 +1,16 @@
-# 📊 FinSync - Investment Portfolio Tracker
+# FinSync - Investment Portfolio Tracker
 
-A modern, full-stack web application for tracking stock and cryptocurrency investments with real-time market data, AI-powered chatbot, interactive visualizations, and cloud database sync.
+A modern, full-stack investment portfolio management platform for tracking stocks and cryptocurrency with real-time market data, AI-powered insights, and comprehensive analytics.
 
-![Portfolio Dashboard](https://img.shields.io/badge/React-19.2.0-61DAFB?style=flat&logo=react&logoColor=white)
+![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=flat&logo=react&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-3178C6?style=flat&logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?style=flat&logo=vite&logoColor=white)
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat&logo=supabase&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
-## ✨ Features
+## Features
 
-### 📈 Portfolio Management
+### Portfolio Management
 - **Real-time Portfolio Tracking** - Monitor stocks and crypto with live market data
 - **P&L Calculations** - Automatic profit/loss tracking with percentage gains
 - **Transaction Management** - Track buy/sell transactions across brokers
@@ -18,51 +18,52 @@ A modern, full-stack web application for tracking stock and cryptocurrency inves
 - **Performance Charts** - Historical portfolio value over time
 - **Asset Allocation** - Visual breakdown by stocks/crypto
 
-### 📊 Data Visualization
+### Data Visualization
 - **Market Heatmap** - S&P 500 performance visualization
 - **Interactive Charts** - Portfolio performance over time (1M, 3M, 6M, 1Y, ALL)
 - **Allocation Pie Chart** - Asset distribution
 - **Price Trends** - Historical data with Recharts
 
-### 👀 Watchlist (Wishlist)
+### Watchlist
 - **Track Tickers** - Monitor stocks/crypto you're interested in
 - **Price Alerts** - Set target prices with visual indicators
 - **Alert Notifications** - "Target Hit!" when price reaches goal
 - **Notes** - Add personal investment notes
 
-### 🤖 AI Investment Assistant
+### FynAI Assistant
 - **Chat Interface** - Floating chatbot button
-- **Gemini AI Powered** - Google's Gemini 2.0 Flash
+- **Gemini AI Powered** - Google's Gemini 2.5 Flash
 - **Investment Focused** - Stocks, crypto, trading, market analysis
-- **Markdown Formatting** - Rich text responses with tables, lists, emojis
+- **Markdown Formatting** - Rich text responses with tables and lists
 - **Conversation History** - Maintains context
+- **Search Integration** - Ask questions directly from search bar
 
-### 🔍 Search & Filter
+### Search & Filter
 - **Transaction Search** - Find by ticker, type, broker, date range
 - **Holdings Sort** - Sort by value, P&L, quantity, ticker
 - **Performance Filter** - Show only profitable or losing positions
 - **Live Stats** - Real-time filtered results count
 
-### 📤 Import/Export
+### Import/Export
 - **CSV Export** - Download all transactions
 - **CSV Import** - Bulk upload transactions
 - **Sample Template** - Pre-formatted CSV template
 - **Data Validation** - Error checking on import
 
-### 🔐 Authentication & Database
+### Authentication & Database
 - **Supabase Auth** - Secure user authentication
 - **PostgreSQL Database** - Cloud-synced data
 - **Row Level Security** - Users only see their own data
 - **Auto-sync** - Data synced across devices
 
-### 🎨 User Experience
+### User Experience
 - **Dark/Light Mode** - Theme toggle
 - **Responsive Design** - Mobile, tablet, desktop
 - **Modern UI** - TailwindCSS styling
 - **Loading States** - Skeleton screens
 - **Empty States** - Helpful messages
 
-## 🚀 Tech Stack
+## Tech Stack
 
 ### Frontend
 - **React 19** - UI framework
@@ -87,7 +88,7 @@ A modern, full-stack web application for tracking stock and cryptocurrency inves
 - **Custom Hooks** - Reusable logic
 - **LocalStorage** - Client-side cache
 
-## 📸 App Sections
+## Application Sections
 
 ### 1. Heatmap (Home)
 - S&P 500 market visualization
@@ -124,7 +125,7 @@ A modern, full-stack web application for tracking stock and cryptocurrency inves
 - Market insights
 - Trading terminology
 
-## 🛠️ Installation & Setup
+## Installation & Setup
 
 ### Prerequisites
 - Node.js (v18 or higher)
@@ -206,14 +207,14 @@ The app uses 5 main tables:
 - Automatic profile creation on signup
 - Password hashing by Supabase Auth
 
-## 📦 Build for Production
+## Build for Production
 
 ```bash
 npm run build
 npm run preview
 ```
 
-## 🌐 Deployment
+## Deployment
 
 ### Deploy to Vercel (Recommended)
 
@@ -251,82 +252,12 @@ Works on any static hosting:
 - AWS Amplify
 - Firebase Hosting
 
-## 🎯 Usage Guide
-
-### Getting Started
-
-1. **Sign Up**
-   - Create account with email/password
-   - Profile auto-created
-   - Start adding transactions
-
-2. **Add Transactions**
-   - Click "Add Transaction" button
-   - Fill in: ticker, type (buy/sell), quantity, price, date, broker
-   - Transaction saved to database
-
-3. **View Portfolio**
-   - See all holdings with current values
-   - Check P&L (profit/loss)
-   - View performance chart
-   - Sort and filter holdings
-
-4. **Create Watchlist**
-   - Navigate to Watchlist page
-   - Click "Add to Watchlist"
-   - Set target price for alerts
-   - Add notes about why you're watching
-
-5. **Search & Filter**
-   - **Transactions**: Search by ticker, filter by type/broker/date
-   - **Holdings**: Sort by value/P&L, filter by performance
-   - Clear filters anytime
-
-6. **Import/Export Data**
-   - **Export**: Download all transactions as CSV
-   - **Import**: Upload CSV file (bulk add)
-   - **Template**: Download sample CSV format
-
-7. **Chat with AI**
-   - Click floating chat button
-   - Ask about stocks, crypto, trading
-   - Get market insights
-   - Learn investment terminology
-
-### Features in Detail
-
-#### Portfolio Performance Chart
-- View portfolio value over time
-- Time ranges: 1M, 3M, 6M, 1Y, ALL
-- Toggle cost basis line
-- See highest/lowest values
-- Track gains/losses
-
-#### Price Alerts
-- Set target prices on watchlist items
-- Visual "Target Hit!" indicator
-- Shows % distance to target
-- Animated pulse when triggered
-
-#### Search & Filter
-- **Transaction filters**: Type, Asset, Broker, Date range
-- **Holdings filters**: Asset type, Performance (profit/loss)
-- **Sorting**: Click column headers to sort
-- **Stats**: Live count of filtered results
-
-#### CSV Import/Export
-- **Export**: One-click download
-- **Import**: Drag & drop or select file
-- **Validation**: Error checking on import
-- **Format**: Date, Ticker, Asset Type, Type, Quantity, Price, Broker
-
-## 🔒 Security
+## Security
 
 ### Authentication
 - **Supabase Auth** - Industry-standard authentication
 - **Password Hashing** - bcrypt encryption
 - **JWT Tokens** - Secure session management
-- **Email Verification** - Optional email confirmation
 
 ### Database Security
 - **Row Level Security (RLS)** - Users only access their own data
@@ -334,168 +265,52 @@ Works on any static hosting:
 - **Automatic Backups** - Supabase handles backups
 - **SSL Encryption** - All connections encrypted
 
-### API Keys
-- **Environment Variables** - Never committed to Git
-- **`.env.local`** - Gitignored by default
-- **Anon Key** - Safe for client-side (RLS protects data)
-- **Service Key** - Never exposed to client
-
 ### Best Practices
-- ✅ Passwords never stored in your tables
-- ✅ API keys in environment variables only
-- ✅ RLS policies on all tables
-- ✅ Input validation on all forms
-- ✅ XSS protection built-in
-- ✅ CSRF protection via Supabase
+- Passwords never stored in application tables
+- API keys in environment variables only
+- RLS policies on all tables
+- Input validation on all forms
+- XSS and CSRF protection
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 finsync-portfolio/
 ├── src/
 │   ├── components/          # React components
-│   │   ├── Dashboard.tsx    # Main dashboard
-│   │   ├── Header.tsx       # Navigation header
-│   │   ├── Heatmap.tsx      # Market heatmap
-│   │   ├── PortfolioSummary.tsx
-│   │   ├── HoldingsTable.tsx
-│   │   ├── TransactionsTable.tsx
-│   │   ├── Wishlist.tsx     # Watchlist
-│   │   ├── PerformanceChart.tsx
-│   │   ├── AIAssistant.tsx  # AI chatbot
-│   │   ├── ImportExportModal.tsx
-│   │   └── icons/           # Icon components
 │   ├── context/             # React Context
-│   │   ├── ThemeContext.tsx
-│   │   └── MarketDataProvider.tsx
 │   ├── hooks/               # Custom hooks
-│   │   ├── usePortfolio.ts
-│   │   └── usePortfolioPerformance.ts
 │   ├── lib/                 # Utilities
-│   │   └── supabase.ts      # Supabase client
 │   ├── services/            # API services
-│   │   └── aiAssistant.ts   # Gemini AI
-│   ├── utils/               # Helper functions
-│   │   └── csvUtils.ts      # CSV import/export
 │   ├── types.ts             # TypeScript types
-│   ├── App.tsx              # Root component
 │   └── main.tsx             # Entry point
 ├── database.sql             # Database schema
-├── .env.local               # Environment variables (create this)
-├── .env.example             # Environment template
-├── package.json
-├── tsconfig.json
-├── vite.config.ts
-└── tailwind.config.js
+├── .env.local               # Environment variables
+└── package.json
 ```
 
-## 🤝 Contributing
+## License
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+This project is licensed under the MIT License.
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Author
 
-### Development Guidelines
-- Follow existing code style
-- Add TypeScript types
-- Test your changes
-- Update documentation
-- Keep commits atomic
+**Rajendran Kumarasamy**
 
-## 🐛 Troubleshooting
+- Portfolio: [rajenk.dev](https://rajenk.dev)
+- LinkedIn: [Rajendran Kumarasamy](https://www.linkedin.com/in/rajendran-kumarasamy/)
+- GitHub: [@rajen05](https://github.com/rajen05)
+- Email: rajendrank.work@gmail.com
 
-### Common Issues
+## Acknowledgments
 
-**Issue: "Cannot find module @supabase/supabase-js"**
-```bash
-npm install @supabase/supabase-js
-```
-
-**Issue: "Missing environment variables"**
-- Ensure `.env.local` exists
-- Check variable names start with `VITE_`
-- Restart dev server after changes
-
-**Issue: "Table doesn't exist"**
-- Run `database.sql` in Supabase SQL Editor
-- Verify tables in Table Editor
-
-**Issue: "Authentication error"**
-- Check Supabase URL and anon key
-- Verify Email provider is enabled
-- Check RLS policies are active
-
-**Issue: "Data not syncing"**
-- Check internet connection
-- Verify Supabase project is active
-- Check browser console for errors
-
-## 🚀 Roadmap
-
-### Planned Features
-- [ ] Multi-currency support
-- [ ] Dividend tracking
-- [ ] Tax reporting
-- [ ] Portfolio comparison
-- [ ] Social features (share portfolios)
-- [ ] Mobile app (React Native)
-- [ ] Advanced charting
-- [ ] Automated trading integration
-- [ ] Portfolio rebalancing suggestions
-- [ ] Risk analysis tools
-
-### Recently Added ✅
-- ✅ Watchlist with price alerts
-- ✅ Portfolio performance chart
-- ✅ CSV import/export
-- ✅ Search & filter
-- ✅ AI chatbot assistant
-- ✅ Supabase database integration
-- ✅ Dark/light mode
-- ✅ Market heatmap
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Your Name**
-- Portfolio: [yourportfolio.com](https://yourportfolio.com)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-- GitHub: [@yourusername](https://github.com/yourusername)
-
-## 🙏 Acknowledgments
+Built with React, TypeScript, Supabase, and Google Gemini AI.
 
 - **Supabase** - Backend and authentication
-- **Google Gemini AI** - AI-powered chatbot
+- **Google Gemini AI** - AI-powered assistant
 - **Recharts** - Data visualization
 - **TailwindCSS** - UI styling
-- **Vite** - Lightning-fast build tool
-- **React** - UI framework
-
-## 📚 Documentation
-
-For detailed setup and usage:
-- `database.sql` - Complete database schema
-- `.env.example` - Environment variable template
-- Code comments - Inline documentation
-
-## 📧 Support
-
-For questions or feedback:
-- Open an issue on GitHub
-- Email: your.email@example.com
-- Twitter: [@yourhandle](https://twitter.com/yourhandle)
-
-## 🌟 Show Your Support
-
-Give a ⭐️ if this project helped you!
 
 ---
 
-**Built with ❤️ using React, TypeScript, Supabase, and Gemini AI**
+**FinSync** - Professional Investment Portfolio Management
