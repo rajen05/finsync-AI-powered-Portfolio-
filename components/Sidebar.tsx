@@ -145,21 +145,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Portfolio Card */}
           {user && (
-            <div className="mx-4 mt-4 mb-3 flex-shrink-0">
-              <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl p-4 text-black shadow-md">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold uppercase tracking-wide">Your Portfolio</span>
+            <div className="mx-3 mt-4 mb-3 flex-shrink-0">
+              <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-2xl p-5 text-black shadow-lg">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-bold uppercase tracking-wide">Your Portfolio</span>
                   <span className="text-xs font-medium">
-                    {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </span>
                 </div>
-                <div className="bg-black rounded-lg p-3 mt-3">
-                  <div className="text-xs text-gray-400 mb-1">Total Invest</div>
-                  <div className="text-2xl font-bold text-white mb-2">
+                <div className="bg-black rounded-xl p-4 mt-2">
+                  <div className="text-xs text-gray-400 mb-2 uppercase tracking-wide">Total Invest</div>
+                  <div className="text-3xl font-bold text-white mb-3">
                     ${portfolioValue.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </div>
-                  <div className="flex items-center">
-                    <span className={`text-sm font-bold ${portfolioChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-base font-bold ${portfolioChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                       {portfolioChange >= 0 ? '▲' : '▼'} {Math.abs(portfolioChangePercent).toFixed(2)}%
                     </span>
                   </div>
