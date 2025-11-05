@@ -25,14 +25,17 @@ async function fetchYahooFinance(symbol: string, range: string = '1d', interval:
     }
 }
 
-const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || process.env.API_KEY || process.env.GEMINI_API_KEY;
 const hasApiKey = !!API_KEY;
 
 console.log('🔑 API Key Check:', {
     hasApiKey,
     API_KEY_length: API_KEY?.length || 0,
+    VITE_GEMINI_API_KEY: !!import.meta.env.VITE_GEMINI_API_KEY,
+    GEMINI_API_KEY: !!import.meta.env.GEMINI_API_KEY,
     process_env_API_KEY: !!process.env.API_KEY,
-    process_env_GEMINI_API_KEY: !!process.env.GEMINI_API_KEY
+    process_env_GEMINI_API_KEY: !!process.env.GEMINI_API_KEY,
+    allEnvVars: Object.keys(import.meta.env)
 });
 
 if (!hasApiKey) {
