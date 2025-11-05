@@ -128,9 +128,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         <div className="flex flex-col h-full overflow-hidden">
           {/* Logo */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex-shrink-0">
+          <div className="flex items-center justify-between px-6 py-4 flex-shrink-0">
             <div className="flex items-center space-x-2">
-              <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">INVESTO</span>
+              <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">FINSYNC</span>
             </div>
             {/* Close button for mobile */}
             <button

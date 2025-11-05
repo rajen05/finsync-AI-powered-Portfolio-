@@ -75,7 +75,7 @@ export async function fetchStockPrices(tickers: string[]): Promise<{ [ticker: st
 }
 
 /**
- * Fetch stock prices from Yahoo Finance (fallback, no API key needed)
+ * Fetch stock prices from Yahoo Finance via serverless API (fallback, no API key needed)
  */
 export async function fetchStockPricesYahoo(tickers: string[]): Promise<{ [ticker: string]: number }> {
   const cacheKey = `yahoo-stock-prices-${tickers.sort().join(',')}`;
@@ -89,12 +89,12 @@ export async function fetchStockPricesYahoo(tickers: string[]): Promise<{ [ticke
   const prices: { [ticker: string]: number } = {};
   
   try {
-    console.log('📊 Fetching stock prices from Yahoo Finance...');
+    console.log('📊 Fetching stock prices from Yahoo Finance via serverless API...');
     
-    // Yahoo Finance allows batch requests
+    // Use serverless API to avoid CORS issues
     const promises = tickers.map(async (ticker) => {
       try {
-        const url = `${YAHOO_API}/${ticker}?interval=1d&range=1d`;
+        const url = `/api/yahoo-finance?symbol=${ticker}&range=1d&interval=1d`;
         const response = await fetch(url);
         
         if (response.ok) {
