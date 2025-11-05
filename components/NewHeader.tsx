@@ -7,17 +7,20 @@ interface NewHeaderProps {
   user: User | null;
   onShowAuth?: (view: 'login' | 'signup') => void;
   onNavigate?: (page: string) => void;
+  onOpenChatbot?: (query: string) => void;
 }
 
-export const NewHeader: React.FC<NewHeaderProps> = ({ onMenuClick, user, onShowAuth, onNavigate }) => {
+export const NewHeader: React.FC<NewHeaderProps> = ({ onMenuClick, user, onShowAuth, onNavigate, onOpenChatbot }) => {
   const { signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search functionality
-    console.log('Searching for:', searchQuery);
+    if (searchQuery.trim() && onOpenChatbot) {
+      onOpenChatbot(searchQuery);
+      setSearchQuery(''); // Clear search after sending to chatbot
+    }
   };
 
   return (

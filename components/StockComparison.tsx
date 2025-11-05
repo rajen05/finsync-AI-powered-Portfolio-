@@ -9,24 +9,77 @@ export const StockComparison: React.FC = () => {
   const [stock2Symbol, setStock2Symbol] = useState('AAPL');
   const [stock1Data, setStock1Data] = useState<StockDetails | null>(null);
   const [stock2Data, setStock2Data] = useState<StockDetails | null>(null);
+  const [stock1ChartData, setStock1ChartData] = useState<any[]>([]);
+  const [stock2ChartData, setStock2ChartData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [timeRange, setTimeRange] = useState('6 Months');
+  const [timeRange, setTimeRange] = useState('3 Months');
 
   const timeRanges = ['1 Day', '1 Week', '1 Month', '3 Months', '6 Months', '1 Year', '5 Years', 'All Time'];
 
+  // Map time ranges to Yahoo Finance API parameters
+  const getYahooParams = (range: string) => {
+    const rangeMap: { [key: string]: { range: string; interval: string } } = {
+      '1 Day': { range: '1d', interval: '5m' },
+      '1 Week': { range: '5d', interval: '1h' },
+      '1 Month': { range: '1mo', interval: '1d' },
+      '3 Months': { range: '3mo', interval: '1d' },
+      '6 Months': { range: '6mo', interval: '1d' },
+      '1 Year': { range: '1y', interval: '1d' },
+      '5 Years': { range: '5y', interval: '1wk' },
+      'All Time': { range: 'max', interval: '1mo' }
+    };
+    return rangeMap[range] || { range: '3mo', interval: '1d' };
+  };
+
   useEffect(() => {
     loadStockData();
-  }, [stock1Symbol, stock2Symbol]);
+  }, [stock1Symbol, stock2Symbol, timeRange]);
+
+  const fetchChartData = async (symbol: string) => {
+    try {
+      const params = getYahooParams(timeRange);
+      const apiUrl = `/api/yahoo-finance?symbol=${symbol}&range=${params.range}&interval=${params.interval}`;
+      const response = await fetch(apiUrl);
+      
+      if (response.ok) {
+        const result = await response.json();
+        const quotes = result.chart?.result?.[0];
+        
+        if (quotes && quotes.timestamp && quotes.indicators?.quote?.[0]) {
+          const timestamps = quotes.timestamp;
+          const prices = quotes.indicators.quote[0].close;
+          
+          const historicalData = timestamps.map((ts: number, index: number) => ({
+            date: new Date(ts * 1000).toLocaleDateString('en-US', { 
+              month: 'short', 
+              day: 'numeric',
+              ...(timeRange === '1 Day' ? { hour: '2-digit', minute: '2-digit' } : {})
+            }),
+            price: prices[index] || 0
+          })).filter((d: any) => d.price > 0);
+          
+          return historicalData;
+        }
+      }
+    } catch (error) {
+      console.error(`Error fetching chart data for ${symbol}:`, error);
+    }
+    return [];
+  };
 
   const loadStockData = async () => {
     setLoading(true);
     try {
-      const [data1, data2] = await Promise.all([
+      const [data1, data2, chart1, chart2] = await Promise.all([
         fetchStockDetails(stock1Symbol),
         fetchStockDetails(stock2Symbol),
+        fetchChartData(stock1Symbol),
+        fetchChartData(stock2Symbol),
       ]);
       setStock1Data(data1);
       setStock2Data(data2);
+      setStock1ChartData(chart1);
+      setStock2ChartData(chart2);
     } catch (error) {
       console.error('Error loading stock data:', error);
     } finally {
@@ -165,9 +218,9 @@ export const StockComparison: React.FC = () => {
                 </div>
               </div>
               <div className="h-64 bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
-                {stock1Data.historicalData && stock1Data.historicalData.length > 0 ? (
+                {stock1ChartData && stock1ChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={stock1Data.historicalData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                    <AreaChart data={stock1ChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                       <defs>
                         <linearGradient id="colorStock1Positive" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9}/>
@@ -240,9 +293,9 @@ export const StockComparison: React.FC = () => {
                 </div>
               </div>
               <div className="h-64 bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
-                {stock2Data.historicalData && stock2Data.historicalData.length > 0 ? (
+                {stock2ChartData && stock2ChartData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={stock2Data.historicalData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                    <AreaChart data={stock2ChartData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                       <defs>
                         <linearGradient id="colorStock2Positive" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9}/>

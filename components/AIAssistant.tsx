@@ -12,13 +12,14 @@ interface Message {
 
 interface AIAssistantProps {
   onClose: () => void;
+  initialQuery?: string;
 }
 
-const AIAssistant: React.FC<AIAssistantProps> = ({ onClose }) => {
+const AIAssistant: React.FC<AIAssistantProps> = ({ onClose, initialQuery }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `👋 **Hello! I'm your FinSync AI Assistant.**
+      content: `👋 **Hello! I'm your FynAI Assistant.**
 
 I can help you with:
 - 📈 **Stock market** analysis and insights
@@ -48,6 +49,43 @@ I can help you with:
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+
+  // Auto-send initial query if provided
+  useEffect(() => {
+    if (initialQuery && initialQuery.trim()) {
+      setInput(initialQuery);
+      // Send the query automatically after a short delay
+      setTimeout(async () => {
+        const userMessage: Message = {
+          role: 'user',
+          content: initialQuery.trim(),
+          timestamp: new Date(),
+        };
+
+        setMessages(prev => [...prev, userMessage]);
+        setInput('');
+        setIsLoading(true);
+        setError(null);
+
+        try {
+          const response = await aiAssistant.sendMessage(initialQuery.trim());
+          
+          const assistantMessage: Message = {
+            role: 'assistant',
+            content: response,
+            timestamp: new Date(),
+          };
+
+          setMessages(prev => [...prev, assistantMessage]);
+        } catch (err: any) {
+          console.error('Error getting AI response:', err);
+          setError(err.message || 'Failed to get response from AI Assistant. Please try again.');
+        } finally {
+          setIsLoading(false);
+        }
+      }, 500);
+    }
+  }, [initialQuery]);
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -112,24 +150,24 @@ I can help you with:
   };
 
   return (
-    <div className="fixed bottom-4 right-4 w-96 h-[600px] bg-white dark:bg-slate-800 rounded-lg shadow-2xl border border-gray-200 dark:border-slate-700 flex flex-col z-50">
+    <div className="fixed bottom-4 right-4 w-96 h-[600px] bg-white dark:bg-black rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 flex flex-col z-50">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-slate-700 bg-gradient-to-r from-blue-600 to-blue-700 rounded-t-lg">
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-black dark:bg-white rounded-t-2xl">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-          <h3 className="font-semibold text-white">FinSync AI Assistant</h3>
+          <h3 className="font-semibold text-white dark:text-black">FynAI</h3>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleReset}
-            className="text-white/80 hover:text-white text-xs px-2 py-1 rounded hover:bg-white/10 transition-colors"
+            className="text-white/80 dark:text-black/80 hover:text-white dark:hover:text-black text-xs px-2 py-1 rounded hover:bg-white/10 dark:hover:bg-black/10 transition-colors"
             title="Clear chat history"
           >
             Clear
           </button>
           <button
             onClick={onClose}
-            className="text-white/80 hover:text-white transition-colors"
+            className="text-white/80 dark:text-black/80 hover:text-white dark:hover:text-black transition-colors"
             title="Close chat"
           >
             <CloseIcon />
@@ -147,8 +185,8 @@ I can help you with:
             <div
               className={`max-w-[80%] rounded-lg px-4 py-2 ${
                 message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 dark:bg-slate-700 text-gray-900 dark:text-white'
+                  ? 'bg-black dark:bg-white text-white dark:text-black'
+                  : 'bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white'
               }`}
             >
               <div className="text-sm prose prose-sm max-w-none dark:prose-invert prose-headings:mt-2 prose-headings:mb-1 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0">
@@ -207,7 +245,7 @@ I can help you with:
         
         {isLoading && (
           <div className="flex justify-start">
-            <div className="bg-gray-100 dark:bg-slate-700 rounded-lg px-4 py-2">
+            <div className="bg-gray-100 dark:bg-gray-900 rounded-lg px-4 py-2">
               <div className="flex gap-1">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -227,7 +265,7 @@ I can help you with:
       </div>
 
       {/* Input */}
-      <div className="p-4 border-t border-gray-200 dark:border-slate-700">
+      <div className="p-4 border-t border-gray-200 dark:border-gray-800">
         <div className="flex gap-2">
           <input
             ref={inputRef}
@@ -236,18 +274,18 @@ I can help you with:
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask about stocks, crypto, or investing..."
-            className="flex-1 px-4 py-2 bg-gray-100 dark:bg-slate-700 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-400"
+            className="flex-1 px-4 py-2 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             disabled={isLoading}
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || isLoading}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors flex items-center justify-center"
+            className="px-4 py-2 bg-black dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-200 disabled:bg-gray-400 disabled:cursor-not-allowed text-white dark:text-black rounded-lg transition-colors flex items-center justify-center"
           >
             <SendIcon />
           </button>
         </div>
-        <p className="text-xs text-gray-500 dark:text-slate-400 mt-2">
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
           Ask me anything about investing, stocks, crypto, or trading!
         </p>
       </div>

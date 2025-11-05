@@ -52,6 +52,7 @@ export const NewDashboard: React.FC<NewDashboardProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportExportOpen, setIsImportExportOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInitialQuery, setChatInitialQuery] = useState<string>('');
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [authView, setAuthView] = useState<'login' | 'signup'>('login');
   const [marketSymbol, setMarketSymbol] = useState<string | null>(null);
@@ -200,6 +201,10 @@ export const NewDashboard: React.FC<NewDashboardProps> = ({
             setShowAuthModal(true);
           }}
           onNavigate={(page) => setCurrentPage(page)}
+          onOpenChatbot={(query) => {
+            setChatInitialQuery(query);
+            setIsChatOpen(true);
+          }}
         />
 
         {/* Page Content */}
@@ -271,7 +276,15 @@ export const NewDashboard: React.FC<NewDashboardProps> = ({
       )}
 
       {/* AI Assistant Chat */}
-      {isChatOpen && <AIAssistant onClose={() => setIsChatOpen(false)} />}
+      {isChatOpen && (
+        <AIAssistant 
+          onClose={() => {
+            setIsChatOpen(false);
+            setChatInitialQuery('');
+          }} 
+          initialQuery={chatInitialQuery}
+        />
+      )}
 
       {/* Auth Modal Overlay */}
       {showAuthModal && (
