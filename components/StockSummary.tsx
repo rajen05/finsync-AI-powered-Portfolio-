@@ -56,7 +56,7 @@ ${marketContext}
 Provide the summary in markdown format.`;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         contents: prompt,
       });
 
