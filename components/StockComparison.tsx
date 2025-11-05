@@ -170,12 +170,14 @@ export const StockComparison: React.FC = () => {
                     <AreaChart data={stock1Data.historicalData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                       <defs>
                         <linearGradient id="colorStock1Positive" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                          <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9}/>
+                          <stop offset="50%" stopColor="#22c55e" stopOpacity={0.6}/>
+                          <stop offset="100%" stopColor="#22c55e" stopOpacity={0.3}/>
                         </linearGradient>
                         <linearGradient id="colorStock1Negative" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                          <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9}/>
+                          <stop offset="50%" stopColor="#ef4444" stopOpacity={0.6}/>
+                          <stop offset="100%" stopColor="#ef4444" stopOpacity={0.3}/>
                         </linearGradient>
                       </defs>
                       <XAxis 
@@ -243,12 +245,14 @@ export const StockComparison: React.FC = () => {
                     <AreaChart data={stock2Data.historicalData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                       <defs>
                         <linearGradient id="colorStock2Positive" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                          <stop offset="0%" stopColor="#22c55e" stopOpacity={0.9}/>
+                          <stop offset="50%" stopColor="#22c55e" stopOpacity={0.6}/>
+                          <stop offset="100%" stopColor="#22c55e" stopOpacity={0.3}/>
                         </linearGradient>
                         <linearGradient id="colorStock2Negative" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
-                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                          <stop offset="0%" stopColor="#ef4444" stopOpacity={0.9}/>
+                          <stop offset="50%" stopColor="#ef4444" stopOpacity={0.6}/>
+                          <stop offset="100%" stopColor="#ef4444" stopOpacity={0.3}/>
                         </linearGradient>
                       </defs>
                       <XAxis 
