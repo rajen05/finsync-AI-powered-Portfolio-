@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { fetchStockDetails } from '../services/geminiService';
 import { StockDetails } from '../types';
+import StockSearch from './StockSearch';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const StockComparison: React.FC = () => {
   const [stock1Symbol, setStock1Symbol] = useState('MSFT');
@@ -42,50 +44,27 @@ export const StockComparison: React.FC = () => {
       <div className="bg-white dark:bg-black rounded-2xl shadow-lg border border-gray-200 dark:border-gray-800 p-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Search Stocks to Compare</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Stock 1 Input */}
-          <div className="relative">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Stock 1 Search */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               1ST STOCK
             </label>
-            <input
-              type="text"
+            <StockSearch
               value={stock1Symbol}
-              onChange={(e) => setStock1Symbol(e.target.value.toUpperCase())}
-              placeholder="e.g., Microsoft"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              onSelect={(symbol) => setStock1Symbol(symbol)}
             />
-            <svg className="absolute right-3 top-11 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
           </div>
 
-          {/* Stock 2 Input */}
-          <div className="relative">
+          {/* Stock 2 Search */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               2ND STOCK
             </label>
-            <input
-              type="text"
+            <StockSearch
               value={stock2Symbol}
-              onChange={(e) => setStock2Symbol(e.target.value.toUpperCase())}
-              placeholder="e.g., Apple"
-              className="w-full px-4 py-3 bg-gray-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              onSelect={(symbol) => setStock2Symbol(symbol)}
             />
-            <svg className="absolute right-3 top-11 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </div>
-
-          {/* Compare Button */}
-          <div className="flex items-end">
-            <button
-              onClick={handleCompare}
-              disabled={loading}
-              className="w-full px-6 py-3 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-semibold rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Loading...' : 'Compare Now'}
-            </button>
           </div>
         </div>
       </div>
@@ -185,8 +164,46 @@ export const StockComparison: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="h-64 bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400 dark:text-gray-500">Chart visualization</span>
+              <div className="h-64 bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+                {stock1Data.historicalData && stock1Data.historicalData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={stock1Data.historicalData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
+                      <XAxis 
+                        dataKey="date" 
+                        stroke="#9CA3AF"
+                        fontSize={12}
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis 
+                        stroke="#9CA3AF"
+                        fontSize={12}
+                        domain={['auto', 'auto']}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1F2937',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                        labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                        formatter={(value: any) => [`$${value.toFixed(2)}`, 'Price']}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="close" 
+                        stroke={stock1Data.change >= 0 ? '#10B981' : '#EF4444'}
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-gray-400 dark:text-gray-500">No chart data available</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -209,8 +226,46 @@ export const StockComparison: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="h-64 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800/20 dark:to-gray-700/20 rounded-lg flex items-center justify-center">
-                <span className="text-gray-400 dark:text-gray-500">Chart visualization</span>
+              <div className="h-64 bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
+                {stock2Data.historicalData && stock2Data.historicalData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={stock2Data.historicalData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
+                      <XAxis 
+                        dataKey="date" 
+                        stroke="#9CA3AF"
+                        fontSize={12}
+                        tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      />
+                      <YAxis 
+                        stroke="#9CA3AF"
+                        fontSize={12}
+                        domain={['auto', 'auto']}
+                      />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#1F2937',
+                          border: '1px solid #374151',
+                          borderRadius: '8px',
+                          color: '#fff'
+                        }}
+                        labelFormatter={(value) => new Date(value).toLocaleDateString()}
+                        formatter={(value: any) => [`$${value.toFixed(2)}`, 'Price']}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="close" 
+                        stroke={stock2Data.change >= 0 ? '#10B981' : '#EF4444'}
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <span className="text-gray-400 dark:text-gray-500">No chart data available</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
