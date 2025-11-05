@@ -1,6 +1,6 @@
 import { GoogleGenAI } from '@google/genai';
 
-const API_KEY = process.env.GEMINI_API_KEY || process.env.API_KEY || '';
+const API_KEY = process.env.API_KEY || process.env.GEMINI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || import.meta.env.GEMINI_API_KEY || '';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -75,7 +75,7 @@ ${conversationContext}
 Respond to the user's latest message as the FinSync AI Assistant.`;
 
       const response = await this.genAI.models.generateContent({
-        model: 'gemini-2.0-flash-exp',
+        model: 'gemini-2.5-flash',
         contents: fullPrompt,
       });
 
@@ -85,8 +85,11 @@ Respond to the user's latest message as the FinSync AI Assistant.`;
       this.conversationHistory.push({ role: 'assistant', content: text });
 
       return text;
-    } catch (error) {
+    } catch (error: any) {
       console.error('AI Assistant error:', error);
+      if (error.message?.includes('429') || error.message?.includes('rate limit')) {
+        throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+      }
       throw new Error('Failed to get response from AI Assistant. Please try again.');
     }
   }

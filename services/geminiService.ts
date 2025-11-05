@@ -249,20 +249,32 @@ export const getStockAnalysis = async (ticker: string, companyName: string, news
         return cachedData;
     }
 
-    const newsContext = news.slice(0, 5).map(n => `- ${n.headline}: ${n.summary}`).join('\n');
-    const prompt = `Based on the following recent news for ${companyName} (${ticker}), provide a brief, balanced "bull vs. bear" analysis for a potential investor. Summarize the key positive and negative points from the news. Conclude with a neutral summary of the overall sentiment. Format the response in Markdown.
+    if (!hasApiKey || !ai) {
+        throw new Error('Gemini API key not configured. Please add GEMINI_API_KEY to your environment variables.');
+    }
+
+    try {
+        const newsContext = news.slice(0, 5).map(n => `- ${n.headline}: ${n.summary}`).join('\n');
+        const prompt = `Based on the following recent news for ${companyName} (${ticker}), provide a brief, balanced "bull vs. bear" analysis for a potential investor. Summarize the key positive and negative points from the news. Conclude with a neutral summary of the overall sentiment. Format the response in Markdown.
 
 Recent News:
 ${newsContext}`;
 
-    const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt
-    });
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt
+        });
 
-    const analysis = response.text;
-    setInCache(cacheKey, analysis);
-    return analysis;
+        const analysis = response.text;
+        setInCache(cacheKey, analysis);
+        return analysis;
+    } catch (error: any) {
+        console.error('❌ Error generating stock analysis:', error);
+        if (error.message?.includes('429') || error.message?.includes('rate limit')) {
+            throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+        }
+        throw new Error('Failed to generate analysis. Please try again later.');
+    }
 };
 
 
