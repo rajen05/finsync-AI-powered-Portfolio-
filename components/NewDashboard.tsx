@@ -199,6 +199,7 @@ export const NewDashboard: React.FC<NewDashboardProps> = ({
             setAuthView(view);
             setShowAuthModal(true);
           }}
+          onNavigate={(page) => setCurrentPage(page)}
         />
 
         {/* Page Content */}

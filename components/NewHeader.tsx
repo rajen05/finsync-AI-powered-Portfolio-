@@ -6,9 +6,10 @@ interface NewHeaderProps {
   onMenuClick: () => void;
   user: User | null;
   onShowAuth?: (view: 'login' | 'signup') => void;
+  onNavigate?: (page: string) => void;
 }
 
-export const NewHeader: React.FC<NewHeaderProps> = ({ onMenuClick, user, onShowAuth }) => {
+export const NewHeader: React.FC<NewHeaderProps> = ({ onMenuClick, user, onShowAuth, onNavigate }) => {
   const { signOut } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -107,17 +108,15 @@ export const NewHeader: React.FC<NewHeaderProps> = ({ onMenuClick, user, onShowA
                         Premium Member
                       </div>
                     </div>
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center space-x-2">
+                    <button 
+                      onClick={() => {
+                        onNavigate?.('profile');
+                        setShowUserMenu(false);
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center space-x-2"
+                    >
                       <span>👤</span>
                       <span>My Profile</span>
-                    </button>
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center space-x-2">
-                      <span>⚙️</span>
-                      <span>Settings</span>
-                    </button>
-                    <button className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 flex items-center space-x-2">
-                      <span>💳</span>
-                      <span>Billing</span>
                     </button>
                     <div className="border-t border-gray-200 dark:border-slate-700 my-2"></div>
                     <button

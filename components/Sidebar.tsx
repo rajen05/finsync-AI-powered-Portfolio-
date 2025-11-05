@@ -35,7 +35,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ];
 
   const bottomMenuItems = [
-    { id: 'settings', label: 'Settings', icon: 'settings', requiresAuth: true },
     { id: 'help', label: 'Help', icon: 'help-circle', requiresAuth: false },
   ];
 
@@ -127,9 +126,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           w-64 lg:w-60 border-r border-gray-200 dark:border-gray-800
         `}
       >
-        <div className="flex flex-col h-full">
+        <div className="flex flex-col h-full overflow-hidden">
           {/* Logo */}
-          <div className="flex items-center justify-between px-6 py-5 border-b border-gray-200 dark:border-slate-700">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-slate-700 flex-shrink-0">
             <div className="flex items-center space-x-2">
               <span className="text-xl font-bold text-gray-900 dark:text-white tracking-tight">INVESTO</span>
             </div>
@@ -146,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Portfolio Card */}
           {user && (
-            <div className="mx-4 mt-6 mb-4">
+            <div className="mx-4 mt-4 mb-3 flex-shrink-0">
               <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl p-4 text-black shadow-md">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs font-semibold uppercase tracking-wide">Your Portfolio</span>
@@ -170,14 +169,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           )}
 
           {/* Main Navigation */}
-          <nav className="flex-1 px-4 py-4 overflow-y-auto">
+          <nav className="flex-1 px-4 py-2 overflow-y-auto min-h-0">
             <ul className="space-y-1">
               {menuItems.map((item) => (
                 <li key={item.id}>
                   <button
                     onClick={() => handleMenuClick(item.id, item.requiresAuth)}
                     className={`
-                      w-full flex items-center space-x-3 px-4 py-3 rounded-lg
+                      w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg
                       transition-all duration-200 text-left
                       ${
                         currentPage === item.id
@@ -200,14 +199,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </nav>
 
           {/* Bottom Navigation */}
-          <div className="border-t border-gray-200 dark:border-slate-700 px-4 py-4">
+          <div className="border-t border-gray-200 dark:border-slate-700 px-4 py-3 flex-shrink-0">
             <ul className="space-y-1">
               {bottomMenuItems.map((item) => (
                 <li key={item.id}>
                   <button
                     onClick={() => handleMenuClick(item.id, item.requiresAuth)}
                     className={`
-                      w-full flex items-center space-x-3 px-4 py-3 rounded-lg
+                      w-full flex items-center space-x-3 px-4 py-2.5 rounded-lg
                       transition-all duration-200 text-left relative
                       ${
                         currentPage === item.id
