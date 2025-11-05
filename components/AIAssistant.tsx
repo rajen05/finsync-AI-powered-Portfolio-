@@ -19,14 +19,14 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ onClose, initialQuery }) => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
-      content: `👋 **Hello! I'm your FynAI Assistant.**
+      content: `**Hello! I'm your FynAI Assistant.**
 
 I can help you with:
-- 📈 **Stock market** analysis and insights
-- 💰 **Cryptocurrency** information and trends  
-- 📊 **Investment strategies** and portfolio management
-- 📚 **Trading terminology** and concepts
-- 🎯 **Market data** interpretation
+- **Stock market** analysis and insights
+- **Cryptocurrency** information and trends  
+- **Investment strategies** and portfolio management
+- **Trading terminology** and concepts
+- **Market data** interpretation
 
 *What would you like to learn about today?*`,
       timestamp: new Date(),
@@ -142,7 +142,7 @@ I can help you with:
     setMessages([
       {
         role: 'assistant',
-        content: '🔄 **Chat history cleared!**\n\nHow can I help you with your investments today?',
+        content: '**Chat history cleared!**\n\nHow can I help you with your investments today?',
         timestamp: new Date(),
       },
     ]);
