@@ -204,7 +204,7 @@ export const StockComparison: React.FC = () => {
                       />
                       <Area 
                         type="monotone" 
-                        dataKey="close" 
+                        dataKey="price" 
                         stroke={stock1Data.change >= 0 ? '#22c55e' : '#ef4444'}
                         strokeWidth={2}
                         fillOpacity={1}
@@ -279,7 +279,7 @@ export const StockComparison: React.FC = () => {
                       />
                       <Area 
                         type="monotone" 
-                        dataKey="close" 
+                        dataKey="price" 
                         stroke={stock2Data.change >= 0 ? '#22c55e' : '#ef4444'}
                         strokeWidth={2}
                         fillOpacity={1}
