@@ -208,7 +208,7 @@ export const fetchStockDetails = async (symbol: string): Promise<StockDetails> =
             const prompt = `Provide stock information for "${symbol}": company name, current price, day's change, day's range, 52-week range, market cap, P/E ratio, dividend yield. Include last 30 days of daily closing prices and 5 recent news articles.`;
             
             const response = await ai.models.generateContent({
-                model: 'gemini-2.0-flash-exp',
+                model: 'gemini-2.5-flash',
                 contents: prompt,
                 config: {
                     responseMimeType: 'application/json',
@@ -331,7 +331,7 @@ export const fetchTopMoversData = async (): Promise<TopMover[]> => {
             const prompt = `List the top 6 market movers today from major US stocks. Include 3 top gainers and 3 top losers. For each: ticker, company name, current price, change value, change percentage.`;
             
             const response = await ai.models.generateContent({
-                model: 'gemini-2.0-flash-exp',
+                model: 'gemini-2.5-flash',
                 contents: prompt,
                 config: {
                     responseMimeType: 'application/json',
@@ -434,7 +434,7 @@ export const fetchHeatmapData = async (): Promise<HeatmapStock[]> => {
             const prompt = `Generate data for a stock market heatmap. Provide a list of 50 major S&P 500 companies from diverse sectors. For each: ticker, company name, today's percentage change (realistic -5% to +5%), market cap, sector.`;
             
             const response = await ai.models.generateContent({
-                model: 'gemini-2.0-flash-exp',
+                model: 'gemini-2.5-flash',
                 contents: prompt,
                 config: {
                     responseMimeType: 'application/json',
