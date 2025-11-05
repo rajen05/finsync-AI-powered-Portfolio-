@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchStockDetails } from '../services/geminiService';
 import { StockDetails } from '../types';
 import StockSearch from './StockSearch';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export const StockComparison: React.FC = () => {
   const [stock1Symbol, setStock1Symbol] = useState('MSFT');
@@ -167,37 +167,48 @@ export const StockComparison: React.FC = () => {
               <div className="h-64 bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
                 {stock1Data.historicalData && stock1Data.historicalData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={stock1Data.historicalData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
+                    <AreaChart data={stock1Data.historicalData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                      <defs>
+                        <linearGradient id="colorStock1Positive" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorStock1Negative" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
                       <XAxis 
                         dataKey="date" 
-                        stroke="#9CA3AF"
-                        fontSize={12}
-                        tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        tick={{ fill: '#94a3b8' }} 
+                        axisLine={{ stroke: '#475569' }} 
+                        tickLine={{ stroke: '#475569' }}
                       />
                       <YAxis 
-                        stroke="#9CA3AF"
-                        fontSize={12}
-                        domain={['auto', 'auto']}
+                        domain={['dataMin', 'dataMax']}
+                        tick={{ fill: '#94a3b8' }} 
+                        axisLine={{ stroke: '#475569' }} 
+                        tickLine={{ stroke: '#475569' }}
+                        tickFormatter={(value: number) => `$${value.toFixed(2)}`}
                       />
-                      <Tooltip
+                      <Tooltip 
                         contentStyle={{
-                          backgroundColor: '#1F2937',
-                          border: '1px solid #374151',
+                          backgroundColor: '#334155',
+                          border: '1px solid #475569',
                           borderRadius: '8px',
                           color: '#fff'
                         }}
-                        labelFormatter={(value) => new Date(value).toLocaleDateString()}
                         formatter={(value: any) => [`$${value.toFixed(2)}`, 'Price']}
                       />
-                      <Line 
+                      <Area 
                         type="monotone" 
                         dataKey="close" 
-                        stroke={stock1Data.change >= 0 ? '#10B981' : '#EF4444'}
+                        stroke={stock1Data.change >= 0 ? '#22c55e' : '#ef4444'}
                         strokeWidth={2}
-                        dot={false}
+                        fillOpacity={1}
+                        fill={stock1Data.change >= 0 ? 'url(#colorStock1Positive)' : 'url(#colorStock1Negative)'}
                       />
-                    </LineChart>
+                    </AreaChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="flex items-center justify-center h-full">
@@ -229,37 +240,48 @@ export const StockComparison: React.FC = () => {
               <div className="h-64 bg-white dark:bg-gray-900 rounded-lg p-4 border border-gray-200 dark:border-gray-800">
                 {stock2Data.historicalData && stock2Data.historicalData.length > 0 ? (
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={stock2Data.historicalData}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
+                    <AreaChart data={stock2Data.historicalData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                      <defs>
+                        <linearGradient id="colorStock2Positive" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#22c55e" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
+                        </linearGradient>
+                        <linearGradient id="colorStock2Negative" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8}/>
+                          <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                        </linearGradient>
+                      </defs>
                       <XAxis 
                         dataKey="date" 
-                        stroke="#9CA3AF"
-                        fontSize={12}
-                        tickFormatter={(value) => new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        tick={{ fill: '#94a3b8' }} 
+                        axisLine={{ stroke: '#475569' }} 
+                        tickLine={{ stroke: '#475569' }}
                       />
                       <YAxis 
-                        stroke="#9CA3AF"
-                        fontSize={12}
-                        domain={['auto', 'auto']}
+                        domain={['dataMin', 'dataMax']}
+                        tick={{ fill: '#94a3b8' }} 
+                        axisLine={{ stroke: '#475569' }} 
+                        tickLine={{ stroke: '#475569' }}
+                        tickFormatter={(value: number) => `$${value.toFixed(2)}`}
                       />
-                      <Tooltip
+                      <Tooltip 
                         contentStyle={{
-                          backgroundColor: '#1F2937',
-                          border: '1px solid #374151',
+                          backgroundColor: '#334155',
+                          border: '1px solid #475569',
                           borderRadius: '8px',
                           color: '#fff'
                         }}
-                        labelFormatter={(value) => new Date(value).toLocaleDateString()}
                         formatter={(value: any) => [`$${value.toFixed(2)}`, 'Price']}
                       />
-                      <Line 
+                      <Area 
                         type="monotone" 
                         dataKey="close" 
-                        stroke={stock2Data.change >= 0 ? '#10B981' : '#EF4444'}
+                        stroke={stock2Data.change >= 0 ? '#22c55e' : '#ef4444'}
                         strokeWidth={2}
-                        dot={false}
+                        fillOpacity={1}
+                        fill={stock2Data.change >= 0 ? 'url(#colorStock2Positive)' : 'url(#colorStock2Negative)'}
                       />
-                    </LineChart>
+                    </AreaChart>
                   </ResponsiveContainer>
                 ) : (
                   <div className="flex items-center justify-center h-full">
