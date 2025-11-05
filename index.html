@@ -37,19 +37,23 @@
       }
     </script>
     <style>
-      /* Ensure dark background on html and body */
+      /* Ensure proper background on html and body */
       html {
-        background-color: #0f172a; /* slate-900 */
+        background-color: #ffffff; /* white */
         min-height: 100vh;
       }
       
       html.dark {
-        background-color: #0f172a; /* slate-900 */
+        background-color: #000000; /* pure black */
       }
       
       body {
         min-height: 100vh;
-        background-color: #0f172a; /* slate-900 */
+        background-color: #ffffff; /* white */
+      }
+      
+      body.dark {
+        background-color: #000000; /* pure black */
       }
       
       /* Hide scrollbar for Chrome, Safari and Opera */
@@ -83,7 +87,7 @@
       }
     </style>
 </head>
-  <body class="font-sans bg-white dark:bg-slate-900 min-h-screen">
+  <body class="font-sans bg-white dark:bg-black min-h-screen">
     <div id="root" class="min-h-screen"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

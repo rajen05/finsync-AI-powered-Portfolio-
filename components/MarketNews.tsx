@@ -81,15 +81,15 @@ const MarketNews: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="bg-slate-800 rounded-lg p-6 border border-slate-700">
+      <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-gray-800">
         <h2 className="text-xl font-bold text-white mb-4">Market News</h2>
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
             <div key={i} className="animate-pulse flex gap-4">
-              <div className="w-32 h-20 bg-slate-700 rounded"></div>
+              <div className="w-32 h-20 bg-gray-200 dark:bg-gray-800 rounded"></div>
               <div className="flex-1 space-y-2">
-                <div className="h-4 bg-slate-700 rounded w-3/4"></div>
-                <div className="h-3 bg-slate-700 rounded w-1/2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-800 rounded w-3/4"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-800 rounded w-1/2"></div>
               </div>
             </div>
           ))}
@@ -104,13 +104,13 @@ const MarketNews: React.FC = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 rounded-lg p-6 border border-gray-200 dark:border-slate-700 transition-colors">
+    <div className="bg-white dark:bg-black rounded-lg p-6 border border-gray-200 dark:border-gray-800 transition-colors">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">Market News</h2>
         <button 
           onClick={handleRefresh}
           disabled={loading}
-          className="flex items-center gap-2 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center gap-2 px-3 py-1.5 bg-black dark:bg-white text-white dark:text-black hover:bg-gray-800 dark:hover:bg-gray-200 disabled:bg-gray-400 rounded-lg transition-colors text-sm font-medium"
         >
           <svg className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -126,7 +126,7 @@ const MarketNews: React.FC = () => {
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-gray-50 dark:bg-slate-700 rounded-lg overflow-hidden hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors cursor-pointer border border-gray-200 dark:border-slate-600"
+            className="bg-gray-50 dark:bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors cursor-pointer border border-gray-200 dark:border-gray-700"
           >
             {article.image && (
               <img src={article.image} alt={article.title} className="w-full h-40 object-cover" />

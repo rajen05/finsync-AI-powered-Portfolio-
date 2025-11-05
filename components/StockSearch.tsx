@@ -229,24 +229,24 @@ const StockSearch: React.FC<StockSearchProps> = ({ onSelect, value }) => {
           onKeyDown={handleKeyDown}
           onFocus={() => query && setShowSuggestions(true)}
           placeholder="Search stocks or crypto (e.g., Apple, TSLA, Bitcoin)..."
-          className="w-full pl-12 pr-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full pl-12 pr-4 py-3 bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent"
         />
       </div>
 
       {/* Suggestions Dropdown */}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl max-h-96 overflow-y-auto">
+        <div className="absolute z-50 w-full mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-2xl max-h-96 overflow-y-auto">
           {suggestions.map((result, index) => (
             <button
               key={result.symbol}
               onClick={() => handleSelect(result.symbol)}
-              className={`w-full px-4 py-3 text-left hover:bg-slate-700 transition-colors flex items-center justify-between ${
-                index === selectedIndex ? 'bg-slate-700' : ''
+              className={`w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors flex items-center justify-between ${
+                index === selectedIndex ? 'bg-gray-100 dark:bg-gray-900' : ''
               }`}
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-white">
+                  <span className="font-semibold text-gray-900 dark:text-white">
                     {highlightMatch(result.symbol, query)}
                   </span>
                   <span className={`text-xs px-2 py-0.5 rounded ${
@@ -257,14 +257,14 @@ const StockSearch: React.FC<StockSearchProps> = ({ onSelect, value }) => {
                     {result.type === 'crypto' ? 'Crypto' : 'Stock'}
                   </span>
                 </div>
-                <div className="text-sm text-slate-400 mt-1">
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   {highlightMatch(result.name, query)}
                   {result.exchange && (
-                    <span className="ml-2 text-slate-500">• {result.exchange}</span>
+                    <span className="ml-2 text-gray-500 dark:text-gray-500">• {result.exchange}</span>
                   )}
                 </div>
               </div>
-              <svg className="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-gray-400 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </button>
@@ -274,11 +274,11 @@ const StockSearch: React.FC<StockSearchProps> = ({ onSelect, value }) => {
 
       {/* No Results */}
       {showSuggestions && query && suggestions.length === 0 && (
-        <div className="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl p-4">
-          <p className="text-slate-400 text-center">
+        <div className="absolute z-50 w-full mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-2xl p-4">
+          <p className="text-gray-600 dark:text-gray-400 text-center">
             No results found for "{query}"
           </p>
-          <p className="text-slate-500 text-sm text-center mt-2">
+          <p className="text-gray-500 dark:text-gray-500 text-sm text-center mt-2">
             Try searching by symbol (AAPL) or company name (Apple)
           </p>
         </div>
@@ -286,19 +286,19 @@ const StockSearch: React.FC<StockSearchProps> = ({ onSelect, value }) => {
 
       {/* Popular Suggestions (when empty) */}
       {showSuggestions && !query && (
-        <div className="absolute z-50 w-full mt-2 bg-slate-800 border border-slate-700 rounded-lg shadow-2xl max-h-96 overflow-y-auto">
-          <div className="px-4 py-2 border-b border-slate-700">
-            <p className="text-xs font-semibold text-slate-400 uppercase">Popular Assets</p>
+        <div className="absolute z-50 w-full mt-2 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 rounded-lg shadow-2xl max-h-96 overflow-y-auto">
+          <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-800">
+            <p className="text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase">Popular Assets</p>
           </div>
           {POPULAR_ASSETS.slice(0, 10).map((result) => (
             <button
               key={result.symbol}
               onClick={() => handleSelect(result.symbol)}
-              className="w-full px-4 py-3 text-left hover:bg-slate-700 transition-colors flex items-center justify-between"
+              className="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors flex items-center justify-between"
             >
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-white">{result.symbol}</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">{result.symbol}</span>
                   <span className={`text-xs px-2 py-0.5 rounded ${
                     result.type === 'crypto' 
                       ? 'bg-orange-900/50 text-orange-300' 
@@ -307,10 +307,10 @@ const StockSearch: React.FC<StockSearchProps> = ({ onSelect, value }) => {
                     {result.type === 'crypto' ? 'Crypto' : 'Stock'}
                   </span>
                 </div>
-                <div className="text-sm text-slate-400 mt-1">
+                <div className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                   {result.name}
                   {result.exchange && (
-                    <span className="ml-2 text-slate-500">• {result.exchange}</span>
+                    <span className="ml-2 text-gray-500 dark:text-gray-500">• {result.exchange}</span>
                   )}
                 </div>
               </div>

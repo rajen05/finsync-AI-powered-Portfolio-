@@ -3,6 +3,7 @@ import { MarketDataProvider } from './context/MarketDataProvider';
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Dashboard } from './components/Dashboard';
+import { NewDashboard } from './components/NewDashboard';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import { useTransactions } from './hooks/useTransactions';
@@ -51,9 +52,9 @@ const AppContent: React.FC = () => {
   // This will be handled in Dashboard component
 
   return (
-    <div className="bg-white dark:bg-slate-900 text-gray-900 dark:text-white min-h-screen transition-colors">
+    <div className="bg-white dark:bg-black text-gray-900 dark:text-white min-h-screen transition-colors">
       <MarketDataProvider portfolioTickers={portfolioTickers}>
-        <Dashboard 
+        <NewDashboard 
           transactions={transactions}
           onAddTransaction={addTransaction}
           wishlist={wishlist}
