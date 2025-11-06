@@ -1,4 +1,4 @@
-# FinSync - Investment Portfolio Tracker
+# FinSync - Investment Portfolio Tracker ![ICON](/icon/Favicon.png)
 
 A modern, full-stack investment portfolio management platform for tracking stocks and cryptocurrency with real-time market data, AI-powered insights, and comprehensive analytics.
 
@@ -49,7 +49,7 @@ A modern, full-stack investment portfolio management platform for tracking stock
 
 ## Features
 
-![Main Dashboard](../FinSync%20Screenshots/Main.png)
+![Main Dashboard](/icon/Main.png)
 
 ### Portfolio Management
 - **Real-time Portfolio Tracking** - Monitor stocks and crypto with live market data
@@ -65,9 +65,9 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Allocation Pie Chart** - Asset distribution
 - **Price Trends** - Historical data with Recharts
 
-![Heatmap View](../FinSync%20Screenshots/2.png)
+![Heatmap View](/icon/2.png)
 
-![Portfolio Overview](../FinSync%20Screenshots/3.png)
+![Portfolio Overview](/icon/3.png)
 
 ### Watchlist
 - **Track Tickers** - Monitor stocks/crypto you're interested in
@@ -75,7 +75,7 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Alert Notifications** - "Target Hit!" when price reaches goal
 - **Notes** - Add personal investment notes
 
-![Watchlist](../FinSync%20Screenshots/5.png)
+![Watchlist](/icon/5.png)
 
 ### FynAI Assistant
 - **Chat Interface** - Floating chatbot button
@@ -85,7 +85,7 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Conversation History** - Maintains context
 - **Search Integration** - Ask questions directly from search bar
 
-![AI Assistant](../FinSync%20Screenshots/7.png)
+![AI Assistant](icon/7.png)
 
 ### Search & Filter
 - **Transaction Search** - Find by ticker, type, broker, date range
@@ -99,9 +99,9 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Sample Template** - Pre-formatted CSV template
 - **Data Validation** - Error checking on import
 
-![Transactions Management](../FinSync%20Screenshots/4.png)
+![Transactions Management](/icon/4.png)
 
-![Market Data](../FinSync%20Screenshots/6.png)
+![Market Data](/icon/6.png)
 
 ### Authentication & Database
 - **Supabase Auth** - Secure user authentication
