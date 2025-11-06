@@ -1,4 +1,4 @@
-# FinSync - Investment Portfolio Tracker ![ICON](/icon/Favicon.png)
+# FinSync 
 
 ## Image Gallery
 
@@ -8,11 +8,10 @@
 
 | Watchlist | AI Assistant | Transactions Management |
 |-----------|--------------|-------------------------|
-| ![Watchlist](/icon/5.png) | ![AI Assistant](icon/7.png) | ![Transactions Management](/icon/4.png) |
+| ![Watchlist](/icon/5.png) | ![AI Assistant](icon/7.png) | ![Transactions Management](/icon/4.png) || ![Market Data](/icon/6.png) |
 
-| Market Data |
-|-------------|
-| ![Market Data](/icon/6.png) |
+
+
 
 
 A modern, full-stack investment portfolio management platform for tracking stocks and cryptocurrency with real-time market data, AI-powered insights, and comprehensive analytics.
