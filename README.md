@@ -1,5 +1,13 @@
 # FinSync 
 
+A modern, full-stack investment portfolio management platform for tracking stocks and cryptocurrency with real-time market data, AI-powered insights, and comprehensive analytics.
+
+![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=flat&logo=react&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-3178C6?style=flat&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?style=flat&logo=vite&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat&logo=supabase&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+
 ## Image Gallery
 
 | Main Dashboard | Heatmap View | Portfolio Overview |
@@ -9,19 +17,6 @@
 | Watchlist | AI Assistant | Transactions Management |
 |-----------|--------------|-------------------------|
 | ![Watchlist](/icon/5.png) | ![AI Assistant](icon/7.png) | ![Transactions Management](/icon/4.png) || ![Market Data](/icon/6.png) |
-
-
-
-
-
-A modern, full-stack investment portfolio management platform for tracking stocks and cryptocurrency with real-time market data, AI-powered insights, and comprehensive analytics.
-
-![React](https://img.shields.io/badge/React-19.2.0-61DAFB?style=flat&logo=react&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.8.2-3178C6?style=flat&logo=typescript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?style=flat&logo=vite&logoColor=white)
-![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat&logo=supabase&logoColor=white)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
-
 ---
 
 ## 📑 Table of Contents
