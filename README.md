@@ -1,4 +1,4 @@
-# FinSync 
+# FinSync - AI Powered Invested Portfolio APP
 
 A modern, full-stack investment portfolio management platform for tracking stocks and cryptocurrency with real-time market data, AI-powered insights, and comprehensive analytics.
 
