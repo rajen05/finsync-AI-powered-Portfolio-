@@ -8,6 +8,45 @@ A modern, full-stack investment portfolio management platform for tracking stock
 ![Supabase](https://img.shields.io/badge/Supabase-PostgreSQL-3ECF8E?style=flat&logo=supabase&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 
+---
+
+## 📑 Table of Contents
+
+- [Features](#features)
+  - [Portfolio Management](#portfolio-management)
+  - [Data Visualization](#data-visualization)
+  - [Watchlist](#watchlist)
+  - [FynAI Assistant](#fynai-assistant)
+  - [Search & Filter](#search--filter)
+  - [Import/Export](#importexport)
+  - [Authentication & Database](#authentication--database)
+  - [User Experience](#user-experience)
+- [Tech Stack](#tech-stack)
+  - [Frontend](#frontend)
+  - [Backend & Database](#backend--database)
+  - [APIs & Services](#apis--services)
+  - [State Management](#state-management)
+- [Application Sections](#application-sections)
+- [Installation & Setup](#installation--setup)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
+  - [Database Schema](#database-schema)
+- [Build for Production](#build-for-production)
+- [Deployment](#deployment)
+  - [Deploy to Vercel (Recommended)](#deploy-to-vercel-recommended)
+  - [Deploy to Netlify](#deploy-to-netlify)
+  - [Other Platforms](#other-platforms)
+- [Security](#security)
+  - [Authentication](#authentication)
+  - [Database Security](#database-security)
+  - [Best Practices](#best-practices)
+- [Project Structure](#project-structure)
+- [License](#license)
+- [Author](#author)
+- [Acknowledgments](#acknowledgments)
+
+---
+
 ## Features
 
 ### Portfolio Management
