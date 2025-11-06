@@ -49,6 +49,8 @@ A modern, full-stack investment portfolio management platform for tracking stock
 
 ## Features
 
+![Main Dashboard](../FinSync%20Screenshots/Main.png)
+
 ### Portfolio Management
 - **Real-time Portfolio Tracking** - Monitor stocks and crypto with live market data
 - **P&L Calculations** - Automatic profit/loss tracking with percentage gains
@@ -63,11 +65,17 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Allocation Pie Chart** - Asset distribution
 - **Price Trends** - Historical data with Recharts
 
+![Heatmap View](../FinSync%20Screenshots/2.png)
+
+![Portfolio Overview](../FinSync%20Screenshots/3.png)
+
 ### Watchlist
 - **Track Tickers** - Monitor stocks/crypto you're interested in
 - **Price Alerts** - Set target prices with visual indicators
 - **Alert Notifications** - "Target Hit!" when price reaches goal
 - **Notes** - Add personal investment notes
+
+![Watchlist](../FinSync%20Screenshots/5.png)
 
 ### FynAI Assistant
 - **Chat Interface** - Floating chatbot button
@@ -76,6 +84,8 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Markdown Formatting** - Rich text responses with tables and lists
 - **Conversation History** - Maintains context
 - **Search Integration** - Ask questions directly from search bar
+
+![AI Assistant](../FinSync%20Screenshots/7.png)
 
 ### Search & Filter
 - **Transaction Search** - Find by ticker, type, broker, date range
@@ -89,6 +99,10 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Sample Template** - Pre-formatted CSV template
 - **Data Validation** - Error checking on import
 
+![Transactions Management](../FinSync%20Screenshots/4.png)
+
+![Market Data](../FinSync%20Screenshots/6.png)
+
 ### Authentication & Database
 - **Supabase Auth** - Secure user authentication
 - **PostgreSQL Database** - Cloud-synced data
@@ -101,6 +115,7 @@ A modern, full-stack investment portfolio management platform for tracking stock
 - **Modern UI** - TailwindCSS styling
 - **Loading States** - Skeleton screens
 - **Empty States** - Helpful messages
+
 
 ## Tech Stack
 
